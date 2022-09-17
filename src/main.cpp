@@ -1,7 +1,7 @@
 #include "server.hpp"
 
 int main(int argc, char** argv) {
-    chisel::Server server;
-
-    server.start();
+    // TODO: 
+    // - Create server configuration files
+    // - Start server with data
 }
