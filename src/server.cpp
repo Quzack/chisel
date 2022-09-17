@@ -1,5 +1,4 @@
 #include <random>
-#include <iostream>
 
 #include "server.hpp"
 
@@ -41,8 +40,7 @@ std::string Server::randB62Str(std::string::size_type len) const {
     std::string str;
     str.reserve(len);
 
-    while(len--)
-        str += chrs[pick(rg)];
+    while(len--) str += chrs[pick(rg)];
 
     return str;
 }
