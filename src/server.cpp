@@ -2,34 +2,32 @@
 
 #include "server.hpp"
 
-using namespace chisel;
+using chisel::Server;
 
-Server::Server(
-    unsigned int port,
-    unsigned int maxPlayers,
-    std::string* name,
-    bool         pub
-):
-    m_port      (port),
-    m_maxPlayers(maxPlayers),
-    m_version   (0x07),
-    m_userCount (0),
-    m_name      (name),
-    m_salt      (randB62Str(16)),
-    m_public    (pub)
+Server::Server( Config* config ):
+    m_config (config),
+    m_version(0x07),
+    m_players(0),
+    m_salt   (randB62Str(16))
 {
     
 }
 
 Server::~Server() {
-    delete m_name;
+    delete m_config;
 }
 
 void Server::start() const {
+    // TODO:
+    // - Send heartbeat to ClassiCube serverlist
+    // - Listen for player joins
+}
+
+void Server::tick() {
     // TODO: Implementation...
 }
 
-std::string Server::randB62Str(std::string::size_type len) const {
+std::string Server::randB62Str( std::string::size_type len ) const {
     auto& chrs = "0123456789"
         "abcdefghijklmnopqrstuvwxyz"
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ";

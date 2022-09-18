@@ -1,28 +1,23 @@
 #include <string>
 
+#include "config.hpp"
+
 const unsigned int DEFAULT_PORT = 25566;
 
 namespace chisel {
     class Server {
         public:
-            Server(
-                    unsigned int port, 
-                    unsigned int maxPlayers, 
-                    std::string* name,
-                    bool         pub
-                );
+            Server ( Config* );
             ~Server();
             
             void start() const;
+            void tick ();
         private:
-            unsigned int m_port;
-            unsigned int m_maxPlayers;
-            unsigned int m_version;
-            unsigned int m_userCount;
-            std::string* m_name;
-            std::string  m_salt;
-            bool         m_public;
+            Config*       m_config;
+            unsigned int  m_version;
+            unsigned int  m_players; // TODO: Change into vector of players
+            std::string   m_salt;
 
-            std::string randB62Str(std::string::size_type) const;
+            std::string randB62Str( std::string::size_type ) const;
     };
 }
