@@ -1,10 +1,11 @@
 #include <random>
+#include <iostream>
 
 #include "server.hpp"
 
 using chisel::Server;
 
-Server::Server( Config* config ):
+Server::Server( chisel::Config* config ):
     m_config (config),
     m_version(0x07),
     m_players(0),

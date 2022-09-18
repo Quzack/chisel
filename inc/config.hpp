@@ -7,8 +7,8 @@ namespace chisel {
         unsigned int maxPlayers;
         std::string  name;
         bool         pub;
-
-        static void createDefault();
-        static Config fromFile   ( std::ifstream& );
     };
+    
+    void createDefaultConfig     ();
+    chisel::Config configFromFile( std::ifstream& );
 }
