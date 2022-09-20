@@ -19,13 +19,11 @@ Server::~Server() {
 }
 
 void Server::start() const {
-    // TODO:
-    // - Send heartbeat to ClassiCube serverlist
-    // - Listen for player joins
+    
 }
 
 void Server::tick() {
-    // TODO: Implementation...
+
 }
 
 std::string Server::randB62Str( std::string::size_type len ) const {

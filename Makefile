@@ -1,5 +1,5 @@
 CC    = g++
-FLAGS = -Iinc
+FLAGS = -Iinc -lws2_32
 SRC   = src/*.cpp
 
 all:
