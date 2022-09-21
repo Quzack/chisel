@@ -1,5 +1,7 @@
 #include <random>
+#include <thread>
 #include <iostream>
+#include <winsock2.h>
 
 #include "server.hpp"
 
@@ -7,7 +9,7 @@ using chisel::Server;
 
 Server::Server( chisel::Config* config ):
     m_config (config),
-    m_version(0x07),
+    m_version(7),
     m_players(0),
     m_salt   (randB62Str(16))
 {
@@ -19,11 +21,34 @@ Server::~Server() {
 }
 
 void Server::start() const {
+    WSADATA wData;
+    WSAStartup(0x2022, &wData);
+
+    SOCKADDR_IN addr;
+    const size_t addrSize =  sizeof(addr);
+
+    addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    addr.sin_port = htons(m_config->port); 
+
+    const int serverFd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    bind(serverFd, (LPSOCKADDR) &addr, addrSize);
+
+    std::cout << "Listening for incoming clients in port " << m_config->port << std::endl;
+    listen(serverFd, SOMAXCONN);
+
+    Config* config = m_config;
     
-}
+    std::thread([config]() {
+        while(true) {
+            // Send heartbeat.
+            std::this_thread::sleep_for(std::chrono::seconds(45));
+        }
+    }).detach();
 
-void Server::tick() {
+    while(true) {
 
+    }
 }
 
 std::string Server::randB62Str( std::string::size_type len ) const {
