@@ -1,2 +1,2 @@
 # chisel
- Minecraft classic server
+ Minecraft Classic / ClassiCube server software
