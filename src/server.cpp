@@ -1,13 +1,13 @@
 #include <random>
-#include <thread>
 #include <iostream>
 #include <winsock2.h>
 
 #include "server.hpp"
+#include "heart.hpp"
 
 using chisel::Server;
 
-Server::Server( chisel::Config* config ):
+Server::Server( Config* config ):
     m_config (config),
     m_version(7),
     m_players(0),
@@ -17,6 +17,8 @@ Server::Server( chisel::Config* config ):
 }
 
 Server::~Server() {
+    WSACleanup();
+
     delete m_config;
 }
 
@@ -36,19 +38,14 @@ void Server::start() const {
 
     std::cout << "Listening for incoming clients in port " << m_config->port << std::endl;
     listen(serverFd, SOMAXCONN);
-
-    Config* config = m_config;
     
-    std::thread([config]() {
-        while(true) {
-            // Send heartbeat.
-            std::this_thread::sleep_for(std::chrono::seconds(45));
-        }
-    }).detach();
+    chisel::Heart(m_config, m_salt, m_players);
 
     while(true) {
 
     }
+
+    closesocket(serverFd);
 }
 
 std::string Server::randB62Str( std::string::size_type len ) const {
