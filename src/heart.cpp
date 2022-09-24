@@ -5,20 +5,16 @@
 
 using chisel::Heart;
 
+const std::string CC_HEARTBEAT_URL = "www.classicube.net/server/heartbeat";
+
 Heart::Heart( 
-    const Config*      config, 
+    const std::string& configParams, 
     const std::string& salt, 
     const int          playerCount 
 ):
-    m_config     (config),
-    m_salt       (salt),
-    m_playerCount(playerCount)
+    m_url(CC_HEARTBEAT_URL + configParams + "&version=7&salt=" + salt + "&users=" + std::to_string(playerCount))
 {
     std::thread(start, this).detach();
-}
-
-Heart::~Heart() {
-    delete m_config;
 }
 
 void Heart::start() const {
