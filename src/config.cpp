@@ -3,6 +3,8 @@
 
 #include "config.hpp"
 
+using chisel::Config;
+
 void chisel::createDefaultConfig() {
     std::ofstream file("config.txt");
     
@@ -14,8 +16,8 @@ void chisel::createDefaultConfig() {
     file.close();
 }
 
-chisel::Config chisel::configFromFile( std::ifstream& file ) {
-    chisel::Config config;
+Config chisel::configFromFile( std::ifstream& file ) {
+    Config      config;
     std::string line;
 
     while(std::getline(file, line)) {
@@ -28,4 +30,15 @@ chisel::Config chisel::configFromFile( std::ifstream& file ) {
     }
 
     return config;
+}
+
+std::string Config::asParams() const {
+    using std::to_string;
+
+    std::string pubString = (pub) ? "True" : "False";
+
+    return "&port=" + to_string(port) + 
+            "&max=" + to_string(maxPlayers) + 
+            "&name=" + name + 
+            "&public=" + pubString;
 }

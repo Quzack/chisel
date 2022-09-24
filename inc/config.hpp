@@ -9,6 +9,8 @@ namespace chisel {
         unsigned int maxPlayers;
         std::string  name;
         bool         pub;
+
+        std::string asParams() const;
     };
     
     void createDefaultConfig     ();

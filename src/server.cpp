@@ -22,7 +22,7 @@ Server::~Server() {
     delete m_config;
 }
 
-void Server::start() const {
+void Server::start() {
     WSADATA wData;
     WSAStartup(0x2022, &wData);
 
@@ -38,14 +38,22 @@ void Server::start() const {
 
     std::cout << "Listening for incoming clients in port " << m_config->port << std::endl;
     listen(serverFd, SOMAXCONN);
-    
-    chisel::Heart(m_config, m_salt, m_players);
+
+    chisel::Heart(m_config->asParams(), m_salt, m_players);
 
     while(true) {
-
+        // TODO
+        // - Handle player
+        // - Count ticks
     }
 
     closesocket(serverFd);
+}
+
+void Server::tick() {
+    // TODO
+    // - Retain players
+    // - World ticks
 }
 
 std::string Server::randB62Str( std::string::size_type len ) const {

@@ -12,7 +12,8 @@ namespace chisel {
             Server ( Config* );
             ~Server();
             
-            void start() const;
+            void start();
+            void tick ();
         private:
             Config*       m_config;
             unsigned int  m_version;
