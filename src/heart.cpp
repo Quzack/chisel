@@ -1,11 +1,14 @@
 #include <thread>
 #include <chrono>
+#include <iostream>
 
 #include "heart.hpp"
 
+#include "HTTPRequest.hpp"
+
 using chisel::Heart;
 
-const std::string CC_HEARTBEAT_URL = "www.classicube.net/server/heartbeat";
+const std::string CC_HEARTBEAT_URL = "http://www.classicube.net/server/heartbeat";
 
 Heart::Heart( 
     const std::string& configParams, 
@@ -18,14 +21,14 @@ Heart::Heart(
 }
 
 void Heart::start() const {
-    while(true) {
-        pulse();
-        std::this_thread::sleep_for(std::chrono::seconds(45));
-    }
-}
+    std::cout << "Sending heartbeat to: " << m_url << std::endl;
+    http::Request http { m_url };
 
-void Heart::pulse() const {
-    // TODO:
-    // - Build URL to ClassiCube
-    // - Send GET request
+    const auto res = http.send();
+    std::cout << "Server URL: "<< std::string{ res.body.begin(), res.body.end() } << std::endl;
+
+    while(true) {
+        std::this_thread::sleep_for(std::chrono::seconds(45));
+        http.send();
+    }
 }

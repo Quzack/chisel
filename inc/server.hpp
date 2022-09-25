@@ -13,7 +13,6 @@ namespace chisel {
             ~Server();
             
             void start();
-            void tick ();
         private:
             Config*       m_config;
             unsigned int  m_version;
@@ -21,5 +20,7 @@ namespace chisel {
             std::string   m_salt;
 
             std::string randB62Str( std::string::size_type ) const;
+
+            void tick();
     };
 }

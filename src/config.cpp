@@ -37,7 +37,7 @@ std::string Config::asParams() const {
 
     std::string pubString = (pub) ? "True" : "False";
 
-    return "&port=" + to_string(port) + 
+    return "?port=" + to_string(port) + 
             "&max=" + to_string(maxPlayers) + 
             "&name=" + name + 
             "&public=" + pubString;

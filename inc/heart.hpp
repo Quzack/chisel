@@ -16,6 +16,5 @@ namespace chisel {
             std::string m_url;
 
             void start() const;
-            void pulse() const;
     };
 }
