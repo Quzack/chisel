@@ -3,8 +3,7 @@
 #include <iostream>
 
 #include "heart.hpp"
-
-#include "HTTPRequest.hpp"
+#include "http_request.hpp"
 
 using chisel::Heart;
 

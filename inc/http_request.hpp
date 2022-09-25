@@ -2,8 +2,8 @@
 //  HTTPRequest
 //
 
-#ifndef HTTPREQUEST_HPP
-#define HTTPREQUEST_HPP
+#ifndef HTTP_REQUEST_HPP
+#define HTTP_REQUEST_HPP
 
 #include <cctype>
 #include <cstddef>
