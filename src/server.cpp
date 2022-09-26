@@ -39,21 +39,17 @@ void Server::start() {
     std::cout << "Listening for incoming clients in port " << m_config->port << std::endl;
     listen(serverFd, SOMAXCONN);
 
-    chisel::Heart(m_config->asParams(), m_salt, m_players);
+    chisel::Heart(m_config->asParams(), m_salt, m_players.size());
 
     while(true) {
-        // TODO
-        // - Handle player
-        // - Count ticks
+        
     }
 
     closesocket(serverFd);
 }
 
 void Server::tick() {
-    // TODO
-    // - Retain players
-    // - World ticks
+    
 }
 
 std::string Server::randB62Str( std::string::size_type len ) const {
