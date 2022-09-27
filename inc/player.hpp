@@ -10,12 +10,15 @@ namespace chisel {
 
     class Player {
         public:
-            Player ( int clientFd, int* serverFd );
+            Player ( const int, const int* );
             ~Player();
 
             void tick();
+
+            void disconnect( std::string );
         private:
             const int  m_clientFd; 
-            const int* m_serverFd;           
+            const int* m_serverFd;
+            const bool m_active;
     };
 }

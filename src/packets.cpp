@@ -6,16 +6,20 @@ namespace chisel::packet {
     Packet packetFromId( const int id ) {
         switch(id) {
             case 0x00:
-                return Packet::CsAuth;
+                return CS_AUTH;
             case 0x05:
-                return Packet::CsSetBlock;
+                return CS_SET_BLOCK;
             case 0x08:
-                return Packet::CsPosition;
+                return CS_POSITION;
             case 0x0d:
-                return Packet::CsMessage;
+                return CS_MESSAGE;
             default:
-                return Packet::Other;
+                return OTHER;
         }
+    }
+
+    namespace client {
+        
     }
 
     char readByte( const int fd ) {
@@ -23,9 +27,5 @@ namespace chisel::packet {
         recv(fd, &byte, 1, 0x8);
 
         return byte;
-    }
-
-    std::string readString( const int fd ) {
-        
     }
 }

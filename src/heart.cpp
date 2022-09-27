@@ -4,8 +4,11 @@
 
 #include "heart.hpp"
 #include "http_request.hpp"
+#include "server.hpp"
 
 using chisel::Heart;
+
+using std::to_string;
 
 const std::string CC_HEARTBEAT_URL = "http://www.classicube.net/server/heartbeat";
 
@@ -14,9 +17,12 @@ Heart::Heart(
     const std::string& salt, 
     const int          playerCount 
 ):
-    m_url(CC_HEARTBEAT_URL + configParams + "&version=7&salt=" + salt + "&users=" + std::to_string(playerCount))
+    m_url(
+        CC_HEARTBEAT_URL + configParams + "&version=7" + to_string(SERVER_VERSION) + "&salt=" + salt + "&users=" + to_string(playerCount)
+    )
 {
     std::thread(start, this).detach();
+    
 }
 
 void Heart::start() const {

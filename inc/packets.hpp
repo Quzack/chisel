@@ -4,25 +4,24 @@
 
 namespace chisel::packet {
     enum Packet {
-        CsAuth,
-        CsSetBlock,
-        CsPosition,
-        CsMessage,
-        Other
+        CS_AUTH,
+        CS_SET_BLOCK,
+        CS_POSITION,
+        CS_MESSAGE,
+        OTHER
     };
 
-    Packet packetFromId( const int id );
+    Packet packetFromId( const int );
 
     namespace client {
-        struct Auth {
+        struct Identify {
             unsigned int protocolVer;
-            std::string  username;
-            std::string  key;
+            std::string  username, key;
         };
 
-        Auth identifyPlayer( const int fd );
+        Identify identifyPlayer( const int );
     }
 
-    char        readByte  ( const int fd );
-    std::string readString( const int fd );
+    char        readByte  ( const int );
+    std::string readString( const int );
 }

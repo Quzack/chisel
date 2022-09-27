@@ -6,7 +6,8 @@
 #include "config.hpp"
 #include "player.hpp"
 
-const unsigned int DEFAULT_PORT = 25566;
+const unsigned int DEFAULT_PORT   = 25566;
+const unsigned int SERVER_VERSION = 0x07;
 
 namespace chisel {
     class Server {
@@ -17,11 +18,10 @@ namespace chisel {
             void start();
         private:
             Config*              m_config;
-            unsigned int         m_version;
             std::vector<Player>  m_players;
             std::string          m_salt;
 
-            std::string randB62Str( std::string::size_type ) const;
+            std::string genSalt() const;
 
             void tick();
     };
