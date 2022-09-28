@@ -1,25 +1,46 @@
-#include <thread>
+#include <iostream>
 
 #include "player.hpp"
+#include "packet.hpp"
 
 using chisel::Player;
 
-Player::Player( const int clientFd, const int* serverFd ):
-    m_clientFd(clientFd),
-    m_serverFd(serverFd),
-    m_active  (true)
+Player::Player( sock::Client& clSock, sock::Server* srSock ):
+    _clSock(clSock),
+    _srSock(srSock),
+    _active(true)
 {
-
+    // TODO 27/9/2022: Threaded player handling.
 }
 
 Player::~Player() {
-    delete m_serverFd;
+
 }
 
-void Player::tick() {
-    // TODO 27/9/22: Player packet logic.
+void Player::tick( const Config* config ) {
+    const int pId = _srSock->read_byte();
+
+    using packet::Packet;
+
+    switch(packet::packet_from_id(pId)) {
+        case Packet::PlayerIdentify: {
+            auto data = packet::client::identify(_srSock);
+            std::cout << "Identifying player " << data.protocolVer << std::endl;
+
+            while (true) {}
+        }
+        case Packet::Unknown:
+            std::cout << "Unknown packet: " << pId << std::endl;
+            break;
+        default:
+            break;
+    }
 }
 
-void Player::disconnect( std::string reason ) {
+void Player::kick( std::string reason ) const {
     // TODO 27/9/22: Send 0x0e packet.
+}
+
+void Player::send_msg( std::string msg ) const {
+    // TODO 28/9/22: Send 0x0d packet.
 }

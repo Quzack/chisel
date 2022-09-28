@@ -5,24 +5,27 @@
 
 #include "config.hpp"
 #include "player.hpp"
-
-const unsigned int DEFAULT_PORT   = 25566;
-const unsigned int SERVER_VERSION = 0x07;
+#include "socket.hpp"
 
 namespace chisel {
-    class Server {
-        public:
-            Server ( Config* );
-            ~Server();
+const unsigned int DEFAULT_PORT = 25566;
+
+class Server {
+public:
+    Server ( Config* );
+    ~Server();
             
-            void start();
-        private:
-            Config*              m_config;
-            std::vector<Player>  m_players;
-            std::string          m_salt;
+    void start();
 
-            std::string genSalt() const;
+    void broadcast( std::string ) const;
+private:
+    Config*             _config;
+    sock::Server        _socket;
+    std::vector<Player> _players;
+    std::string         _salt;
 
-            void tick();
-    };
+    void tick();
+
+    std::string gen_salt() const;
+};
 }

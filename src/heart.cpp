@@ -4,7 +4,7 @@
 
 #include "heart.hpp"
 #include "http_request.hpp"
-#include "server.hpp"
+#include "packet.hpp"
 
 using chisel::Heart;
 
@@ -17,8 +17,8 @@ Heart::Heart(
     const std::string& salt, 
     const int          playerCount 
 ):
-    m_url(
-        CC_HEARTBEAT_URL + configParams + "&version=7" + to_string(SERVER_VERSION) + "&salt=" + salt + "&users=" + to_string(playerCount)
+    _url(
+        CC_HEARTBEAT_URL + configParams + "&version=" + to_string(chisel::packet::PROTOCOL_VERSION) + "&salt=" + salt + "&users=" + to_string(playerCount)
     )
 {
     std::thread(start, this).detach();
@@ -26,8 +26,8 @@ Heart::Heart(
 }
 
 void Heart::start() const {
-    std::cout << "Sending heartbeat to: " << m_url << std::endl;
-    http::Request http { m_url };
+    std::cout << "Sending heartbeat to: " << _url << std::endl;
+    http::Request http { _url };
 
     const auto res = http.send();
     std::cout << "Server URL: "<< std::string{ res.body.begin(), res.body.end() } << std::endl;

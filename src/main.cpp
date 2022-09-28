@@ -1,9 +1,11 @@
-#include <string>
 #include <fstream>
+#include <iostream>
 
 #include "server.hpp"
 
-bool fileExists(const char* name) {
+using chisel::Config;
+
+bool file_exists(const char* name) {
     FILE* file;
     if(file = fopen(name, "r")) {
         fclose(file);
@@ -14,11 +16,15 @@ bool fileExists(const char* name) {
 }
 
 int main(int argc, char** argv) {
-    if(!fileExists("config.txt")) chisel::createDefaultConfig();
+    if(!file_exists("config.txt")) {
+        Config::create_new();
+    }
 
     std::ifstream configFile("config.txt");
-    chisel::Config config = chisel::configFromFile(configFile);
+    Config config = Config::from_file(configFile);
 
     chisel::Server server(&config);
     server.start();
+
+    // TODO 28/9/22: Console messages.
 }

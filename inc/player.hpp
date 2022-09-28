@@ -2,23 +2,27 @@
 
 #include <string>
 
+#include "config.hpp"
+#include "socket.hpp"
+
 namespace chisel {
-    struct Location {
-        int          x, y, z;
-        unsigned int yaw, pitch;
-    };
+struct Location {
+    int          x, y, z;
+    unsigned int yaw, pitch;
+};
 
-    class Player {
-        public:
-            Player ( const int, const int* );
-            ~Player();
+class Player {
+public:
+    Player ( sock::Client&, sock::Server* );
+    ~Player();
 
-            void tick();
+    void tick( const Config* );
 
-            void disconnect( std::string );
-        private:
-            const int  m_clientFd; 
-            const int* m_serverFd;
-            const bool m_active;
-    };
+    void kick    ( std::string ) const;
+    void send_msg( std::string ) const;
+private:
+    const sock::Client& _clSock;
+    const sock::Server* _srSock;
+    const bool          _active;
+};
 }

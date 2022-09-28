@@ -2,21 +2,24 @@
 #include <sstream>
 
 #include "config.hpp"
+#include "server.hpp"
 
 using chisel::Config;
 
-void chisel::createDefaultConfig() {
+using std::to_string;
+
+void Config::create_new() {
     std::ofstream file("config.txt");
     
-    file << "port: 25565"     << std::endl;
-    file << "max-players: 20" << std::endl;
-    file << "name: MyServer"  << std::endl;
-    file << "public: false"   << std::endl; 
+    file << "port: " << to_string(chisel::DEFAULT_PORT) << std::endl;
+    file << "max-players: 20"                           << std::endl;
+    file << "name: MyServer"                            << std::endl;
+    file << "public: false"                             << std::endl; 
 
     file.close();
 }
 
-Config chisel::configFromFile( std::ifstream& file ) {
+Config Config::from_file( std::ifstream& file ) {
     Config      config;
     std::string line;
 
@@ -32,13 +35,11 @@ Config chisel::configFromFile( std::ifstream& file ) {
     return config;
 }
 
-std::string Config::asParams() const {
-    using std::to_string;
-
+std::string Config::params() const {
     std::string pubString = (pub) ? "True" : "False";
 
-    return "?port=" + to_string(port) + 
-            "&max=" + to_string(maxPlayers) + 
-            "&name=" + name + 
+    return "?port="    + to_string(port)       + 
+            "&max="    + to_string(maxPlayers) + 
+            "&name="   + name                  + 
             "&public=" + pubString;
 }
