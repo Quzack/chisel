@@ -17,7 +17,7 @@ public:
     ~Server();
 
     void listen_port( const int );
-    
+ 
     Client        accept_cl() const;
     unsigned char read_byte() const;
     std::string   read_str () const;

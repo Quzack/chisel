@@ -18,18 +18,18 @@ Player::~Player() {
 }
 
 void Player::tick( const Config* config ) {
-    const int pId = _srSock->read_byte();
-
+    const unsigned char pId = _srSock->read_byte();
+    
     using packet::Packet;
 
     switch(packet::packet_from_id(pId)) {
-        case Packet::PlayerIdentify: {
+        case Packet::CS_AUTH: {
             auto data = packet::client::identify(_srSock);
             std::cout << "Identifying player " << data.protocolVer << std::endl;
 
-            while (true) {}
+            while(true) {}
         }
-        case Packet::Unknown:
+        case Packet::UNKNOWN:
             std::cout << "Unknown packet: " << pId << std::endl;
             break;
         default:

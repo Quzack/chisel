@@ -41,20 +41,19 @@ Client Server::accept_cl() const {
 }
 
 unsigned char Server::read_byte() const {
-    char buff;
-    recv(_fd, &buff, 1, 0x8);
+    char buffer;
+    recv(_fd, &buffer, 1, 0x8);
 
-    return (unsigned char) buff;
+    return buffer;
 }
 
 std::string Server::read_str() const {
-    std::vector<unsigned char> bytes;
+    const int len = read_byte();
 
-    for(int i = 0; i < 64; ++i) {
-        bytes.push_back(read_byte());
-    }
+    char* buffer;
+    recv(_fd, buffer, len, 0x8);
 
-    return std::string(bytes.begin(), bytes.end());
+    return buffer;
 }
 
 Client::Client( int fd ):
