@@ -18,9 +18,9 @@ public:
 
     void listen_port( const int );
  
-    Client        accept_cl() const;
-    unsigned char read_byte() const;
-    std::string   read_str () const;
+    Client      accept_cl() const;
+    int         read_byte() const;
+    std::string read_str () const;
 private:
     SOCKADDR_IN _addr;
     int         _fd;

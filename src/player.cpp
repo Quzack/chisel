@@ -1,11 +1,11 @@
 #include <iostream>
 
 #include "player.hpp"
-#include "packet.hpp"
+#include "network/packet.hpp"
 
 using chisel::Player;
 
-Player::Player( sock::Client& clSock, sock::Server* srSock ):
+Player::Player( sock::Client clSock, sock::Server* srSock ):
     _clSock(clSock),
     _srSock(srSock),
     _active(true)
@@ -18,8 +18,9 @@ Player::~Player() {
 }
 
 void Player::tick( const Config* config ) {
-    const unsigned char pId = _srSock->read_byte();
-    
+    const int pId = _srSock->read_byte();
+    if(pId == -1) return;
+
     using packet::Packet;
 
     switch(packet::packet_from_id(pId)) {

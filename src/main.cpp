@@ -2,18 +2,9 @@
 #include <iostream>
 
 #include "server.hpp"
+#include "utils.hpp"
 
 using chisel::Config;
-
-bool file_exists(const char* name) {
-    FILE* file;
-    if(file = fopen(name, "r")) {
-        fclose(file);
-        return true;
-    }
-
-    return false;
-}
 
 int main(int argc, char** argv) {
     if(!file_exists("config.txt")) {

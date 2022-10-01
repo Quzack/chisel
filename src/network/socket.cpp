@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 
-#include "socket.hpp"
+#include "network/socket.hpp"
 
 using chisel::sock::Server;
 using chisel::sock::Client;
@@ -40,11 +40,9 @@ Client Server::accept_cl() const {
     return Client(fd);
 }
 
-unsigned char Server::read_byte() const {
+int Server::read_byte() const {
     char buffer;
-    recv(_fd, &buffer, 1, 0x8);
-
-    return buffer;
+    return (recv(_fd, &buffer, 1, 0x8) == -1) ? -1 : buffer;
 }
 
 std::string Server::read_str() const {

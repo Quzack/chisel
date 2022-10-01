@@ -4,11 +4,12 @@
 #include <vector>
 
 #include "config.hpp"
+#include "network/socket.hpp"
 #include "player.hpp"
-#include "socket.hpp"
+#include "logger.hpp"
 
 namespace chisel {
-const unsigned int DEFAULT_PORT = 25566;
+const unsigned int DEFAULT_PORT = 25565;
 
 class Server {
 public:
@@ -19,13 +20,12 @@ public:
 
     void broadcast( std::string ) const;
 private:
-    Config*             _config;
-    sock::Server        _socket;
-    std::vector<Player> _players;
-    std::string         _salt;
+    std::string          _salt;
+    Config*              _config;
+    sock::Server         _socket;
+    logger::Logger       _logger;
+    std::vector<Player>  _players;
 
     void tick();
-
-    std::string gen_salt() const;
 };
 }

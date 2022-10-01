@@ -3,17 +3,12 @@
 #include <string>
 
 #include "config.hpp"
-#include "socket.hpp"
+#include "network/socket.hpp"
 
 namespace chisel {
-struct Location {
-    int          x, y, z;
-    unsigned int yaw, pitch;
-};
-
 class Player {
 public:
-    Player ( sock::Client&, sock::Server* );
+    Player ( sock::Client, sock::Server* );
     ~Player();
 
     void tick( const Config* );
@@ -21,7 +16,7 @@ public:
     void kick    ( std::string ) const;
     void send_msg( std::string ) const;
 private:
-    const sock::Client& _clSock;
+    const sock::Client  _clSock;
     const sock::Server* _srSock;
     const bool          _active;
 };

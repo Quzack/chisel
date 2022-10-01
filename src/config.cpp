@@ -8,6 +8,15 @@ using chisel::Config;
 
 using std::to_string;
 
+std::string Config::params() const {
+    std::string pubString = (pub) ? "True" : "False";
+
+    return "?port="    + to_string(port)       + 
+            "&max="    + to_string(maxPlayers) + 
+            "&name="   + name                  + 
+            "&public=" + pubString;
+}
+
 void Config::create_new() {
     std::ofstream file("config.txt");
     
@@ -33,13 +42,4 @@ Config Config::from_file( std::ifstream& file ) {
     }
 
     return config;
-}
-
-std::string Config::params() const {
-    std::string pubString = (pub) ? "True" : "False";
-
-    return "?port="    + to_string(port)       + 
-            "&max="    + to_string(maxPlayers) + 
-            "&name="   + name                  + 
-            "&public=" + pubString;
 }

@@ -3,14 +3,15 @@
 #include <string>
 
 #include "config.hpp"
+#include "logger.hpp"
 
 namespace chisel {
 class Heart {
 public:
-    Heart ( 
+    Heart( 
         const std::string& configParams, 
         const std::string& salt, 
-        const int          playerCount 
+        const int          playerCount
     );
 private:
     std::string _url;

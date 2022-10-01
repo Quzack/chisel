@@ -3,8 +3,8 @@
 #include <iostream>
 
 #include "heart.hpp"
-#include "http_request.hpp"
-#include "packet.hpp"
+#include "network/http.hpp"
+#include "network/packet.hpp"
 
 using chisel::Heart;
 
@@ -15,18 +15,16 @@ const std::string CC_HEARTBEAT_URL = "http://www.classicube.net/server/heartbeat
 Heart::Heart( 
     const std::string& configParams, 
     const std::string& salt, 
-    const int          playerCount 
+    const int          playerCount
 ):
     _url(
         CC_HEARTBEAT_URL + configParams + "&version=" + to_string(chisel::packet::PROTOCOL_VERSION) + "&salt=" + salt + "&users=" + to_string(playerCount)
     )
 {
     std::thread(start, this).detach();
-    
 }
 
 void Heart::start() const {
-    std::cout << "Sending heartbeat to: " << _url << std::endl;
     http::Request http { _url };
 
     const auto res = http.send();
