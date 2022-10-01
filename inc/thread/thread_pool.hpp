@@ -6,7 +6,7 @@
 namespace chisel::thread {
 class ThreadPool {
 public:
-    ThreadPool ( int threadCount );
+    ThreadPool ( int );
     ~ThreadPool();
 
     ThreadPool             (const ThreadPool&) = delete;
