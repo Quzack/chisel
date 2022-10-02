@@ -2,7 +2,7 @@
 #include <random>
 #include <time.h>
 
-#include "utils.hpp"
+#include "utils.h"
 
 bool file_exists( const char* name ) {
     FILE* file;if(file = fopen(name, "r")) {

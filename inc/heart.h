@@ -2,8 +2,8 @@
 
 #include <string>
 
-#include "config.hpp"
-#include "logger.hpp"
+#include "config.h"
+#include "logger.h"
 
 namespace chisel {
 class Heart {

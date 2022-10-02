@@ -2,15 +2,15 @@
 #include <chrono>
 #include <iostream>
 
-#include "heart.hpp"
-#include "network/http.hpp"
-#include "network/packet.hpp"
+#include "heart.h"
+#include "network/http.h"
+#include "network/packet.h"
 
 using chisel::Heart;
 
 using std::to_string;
 
-const std::string CC_HEARTBEAT_URL = "http://www.classicube.net/server/heartbeat";
+const std::string HEARTBEAT_URL = "http://www.classicube.net/server/heartbeat";
 
 Heart::Heart( 
     const std::string& configParams, 
@@ -18,7 +18,7 @@ Heart::Heart(
     const int          playerCount
 ):
     _url(
-        CC_HEARTBEAT_URL + configParams + "&version=" + to_string(chisel::packet::PROTOCOL_VERSION) + "&salt=" + salt + "&users=" + to_string(playerCount)
+        HEARTBEAT_URL + configParams + "&version=" + to_string(chisel::packet::PROTOCOL_VERSION) + "&salt=" + salt + "&users=" + to_string(playerCount)
     )
 {
     std::thread(start, this).detach();

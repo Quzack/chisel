@@ -2,8 +2,8 @@
 
 #include <string>
 
-#include "config.hpp"
-#include "network/socket.hpp"
+#include "config.h"
+#include "network/socket.h"
 
 namespace chisel {
 class Player {

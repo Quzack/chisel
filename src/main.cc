@@ -1,10 +1,10 @@
 #include <fstream>
 #include <iostream>
 
-#include "server.hpp"
-#include "utils.hpp"
+#include "server.h"
+#include "utils.h"
 
-using chisel::Config;
+using chisel::file::Config;
 
 int main(int argc, char** argv) {
     if(!file_exists("config.txt")) {
@@ -13,7 +13,7 @@ int main(int argc, char** argv) {
 
     std::ifstream configFile("config.txt");
     Config config = Config::from_file(configFile);
-
+    
     chisel::Server server(&config);
     server.start();
 

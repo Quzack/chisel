@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include "socket.hpp"
+#include "socket.h"
 
 namespace chisel::packet {
 const unsigned int PROTOCOL_VERSION = 0x07;

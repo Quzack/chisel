@@ -1,8 +1,8 @@
 #include <iostream>
 #include <sstream>
 
-#include "config.hpp"
-#include "server.hpp"
+#include "config.h"
+#include "server.h"
 
 using chisel::Config;
 

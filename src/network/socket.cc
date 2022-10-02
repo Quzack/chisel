@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 
-#include "network/socket.hpp"
+#include "network/socket.h"
 
 using chisel::sock::Server;
 using chisel::sock::Client;

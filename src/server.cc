@@ -1,9 +1,9 @@
 #include <random>
 #include <time.h>
 
-#include "heart.hpp"
-#include "server.hpp"
-#include "utils.hpp"
+#include "heart.h"
+#include "server.h"
+#include "utils.h"
 
 using chisel::Server;
 

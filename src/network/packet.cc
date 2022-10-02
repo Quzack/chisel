@@ -1,7 +1,7 @@
 #include <winsock2.h>
 #include <iostream>
 
-#include "network/packet.hpp"
+#include "network/packet.h"
 
 namespace chisel::packet {
 Packet packet_from_id( const int id ) {

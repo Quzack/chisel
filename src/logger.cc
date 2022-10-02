@@ -1,8 +1,8 @@
 #include <iostream>
 #include <sys/stat.h>
 
-#include "logger.hpp"
-#include "utils.hpp"
+#include "logger.h"
+#include "utils.h"
 
 using chisel::logger::Logger;
 

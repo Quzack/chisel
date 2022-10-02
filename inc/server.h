@@ -3,10 +3,10 @@
 #include <string>
 #include <vector>
 
-#include "config.hpp"
-#include "network/socket.hpp"
-#include "player.hpp"
-#include "logger.hpp"
+#include "config.h"
+#include "logger.h"
+#include "network/socket.h"
+#include "player.h"
 
 namespace chisel {
 const unsigned int DEFAULT_PORT = 25565;
