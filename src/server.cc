@@ -1,16 +1,20 @@
 #include <random>
 #include <time.h>
 
-#include "heart.h"
 #include "server.h"
 #include "utils.h"
+#include "network/packet.h"
+#include "network/http.h"
 
 using chisel::Server;
 
+const std::string HEARTBEAT_URL = "http://www.classicube.net/server/heartbeat";
+
 Server::Server( Config* config ):
-    _salt  (rand_b62_str(16)),
-    _config(config),
-    _logger("LOG_" + std::to_string(time(NULL)) + ".txt")
+    _salt      (rand_b62_str(16)),
+    _config    (config),
+    _logger    ("LOG_" + std::to_string(time(NULL)) + ".txt"),
+    _threadPool(_config->maxPlayers + 5)
 {
 
 }
@@ -23,7 +27,7 @@ void Server::start() {
     _socket.listen_port(_config->port);
     _logger.log(logger::LL_INFO, "Listening for clients...");
 
-    chisel::Heart(_config->params(), _salt, _players.size());
+    _threadPool.push(start_heart, this);
 
     while(true) {
         auto client = _socket.accept_cl();
@@ -45,5 +49,22 @@ void Server::broadcast( std::string msg ) const {
 void Server::tick() {
     for(auto& p : _players) {
         p.tick(_config);
+    }
+}
+
+void Server::start_heart() {
+    using std::to_string;
+
+    auto url = 
+        HEARTBEAT_URL + _config->params() + "&version=" + to_string(packet::PROTOCOL_VERSION) +"&salt" + _salt + "&users=" + to_string(_players.size());
+    
+    http::Request req { url };
+    
+    const auto res = req.send();
+    _logger.log(logger::LL_INFO, "Server URL: " + std::string{ res.body.begin(), res.body.end() });
+
+    while(true) {
+        std::this_thread::sleep_for(std::chrono::seconds(45));
+        req.send();
     }
 }

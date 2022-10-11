@@ -4,7 +4,7 @@
 #include "server.h"
 #include "utils.h"
 
-using chisel::file::Config;
+using chisel::Config;
 
 int main(int argc, char** argv) {
     if(!file_exists("config.txt")) {

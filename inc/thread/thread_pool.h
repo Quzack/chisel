@@ -9,9 +9,6 @@ public:
     ThreadPool ( int );
     ~ThreadPool();
 
-    ThreadPool             (const ThreadPool&) = delete;
-    ThreadPool& operator = (const ThreadPool&) = delete;
-
     template<typename F, typename A>
     void push(F&&, A&&);
 private:
