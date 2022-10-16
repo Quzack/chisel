@@ -19,7 +19,10 @@ Player::~Player() {
 
 void Player::tick( const Config* config ) {
     const int pId = _srSock->read_byte();
-    if(pId == -1) return;
+    if(pId == -1) {
+        printf("No data.");
+        return;
+    }
 
     using packet::Packet;
 

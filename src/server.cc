@@ -6,6 +6,8 @@
 #include "network/packet.h"
 #include "network/http.h"
 
+#define TICK_INTERVAL 1000/20
+
 using chisel::Server;
 
 const std::string HEARTBEAT_URL = "http://www.classicube.net/server/heartbeat";
@@ -31,14 +33,18 @@ void Server::start() {
 
     _threadPool.queue([this] { this->start_heart(); });
 
+    _threadPool.queue([this] { 
+        while(true) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(TICK_INTERVAL));
+            this->tick();
+        }
+    });
+
     while(true) {
         auto client = _socket.accept_cl();
         Player player(client, &_socket);
 
         _players.push_back(player);
-
-        // TODO 29/9/22: Create thread and run ticks periodically.
-        tick();
     }
 }
 

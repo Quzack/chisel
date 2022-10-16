@@ -22,21 +22,17 @@ public:
 
     ~Logger() { _file.close(); }
 
-    void log( LoggerLevel, std::string&& );
+    void log( LoggerLevel l, std::string&& m ) {
+        _file << "[" << current_date_time() << "] " << "(" << lv_prf(l) << "): " << m << std::endl;
+    }
 private:
     std::ofstream _file;
 
-    std::string lvl_pre( LoggerLevel l ) const;
-};
-
-void Logger::log( LoggerLevel l, std::string&& m) {
-    _file << "[" << current_date_time() << "] " << "(" << lvl_pre(l) << "): " << m << std::endl;
-}
-
-std::string Logger::lvl_pre( LoggerLevel l ) const {
-    switch(l) {
-        case LL_INFO: return "INFO";
-        case LL_WARN: return "WARN";
+    std::string lv_prf( LoggerLevel l ) const {
+        switch(l) {
+            case LL_INFO: return "INFO";
+            case LL_WARN: return "WARN";
+        }
     }
-}
+};
 }
