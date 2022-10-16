@@ -1,29 +1,23 @@
-#include <iostream>
 #include <sstream>
 
 #include "config.h"
-#include "server.h"
 
 using chisel::Config;
 
-using std::to_string;
-
 std::string Config::params() const {
-    std::string pubString = (pub) ? "True" : "False";
-
-    return "?port="    + to_string(port)       + 
-            "&max="    + to_string(maxPlayers) + 
-            "&name="   + name                  + 
-            "&public=" + pubString;
+    return "?port="    + std::to_string(port)      + 
+            "&max="    + std::to_string(maxPlayers) + 
+            "&name="   + name                       + 
+            "&public=" + (pub ? "True" : "False");
 }
 
 void Config::create_new() {
     std::ofstream file("config.txt");
     
-    file << "port: " << to_string(chisel::DEFAULT_PORT) << std::endl;
-    file << "max-players: 20"                           << std::endl;
-    file << "name: MyServer"                            << std::endl;
-    file << "public: false"                             << std::endl; 
+    file << "port: " << 25565 << std::endl;
+    file << "max-players: 20" << std::endl;
+    file << "name: MyServer"  << std::endl;
+    file << "public: false"   << std::endl; 
 
     file.close();
 }

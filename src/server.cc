@@ -16,10 +16,12 @@ Server::Server( Config* config ):
     _logger    ("LOG_" + std::to_string(time(NULL)) + ".txt"),
     _threadPool(_config->maxPlayers + 5)
 {
-
+    _threadPool.start();
 }
 
 Server::~Server() {
+    _threadPool.stop();
+
     delete _config;
 }
 
@@ -27,7 +29,7 @@ void Server::start() {
     _socket.listen_port(_config->port);
     _logger.log(logger::LL_INFO, "Listening for clients...");
 
-    _threadPool.push(start_heart, this);
+    _threadPool.queue([this] { this->start_heart(); });
 
     while(true) {
         auto client = _socket.accept_cl();
@@ -40,12 +42,6 @@ void Server::start() {
     }
 }
 
-void Server::broadcast( std::string msg ) const {
-    for(auto& p : _players) {
-        p.send_msg(msg);
-    }
-}
-
 void Server::tick() {
     for(auto& p : _players) {
         p.tick(_config);
@@ -53,10 +49,10 @@ void Server::tick() {
 }
 
 void Server::start_heart() {
-    using std::to_string;
-
-    auto url = 
-        HEARTBEAT_URL + _config->params() + "&version=" + to_string(packet::PROTOCOL_VERSION) +"&salt" + _salt + "&users=" + to_string(_players.size());
+    auto url = HEARTBEAT_URL + _config->params()               + 
+        "&version=" + std::to_string(packet::PROTOCOL_VERSION) +
+        "&salt="    + _salt                                    + 
+        "&users="   + std::to_string(_players.size());
     
     http::Request req { url };
     

@@ -10,16 +10,12 @@
 #include "player.h"
 
 namespace chisel {
-const unsigned int DEFAULT_PORT = 25565;
-
 class Server {
 public:
     Server ( Config* );
     ~Server();
             
     void start();
-
-    void broadcast( std::string ) const;
 private:
     std::string          _salt;
     Config*              _config;
