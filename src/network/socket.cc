@@ -40,22 +40,20 @@ Client Server::accept_cl() const {
     return Client(fd);
 }
 
-int Server::read_byte() const {
-    char buffer;
-    return (recv(_fd, &buffer, 1, 0x8) == -1) ? -1 : buffer;
-}
-
-std::string Server::read_str() const {
-    const int len = read_byte();
-
-    char* buffer;
-    recv(_fd, buffer, len, 0x8);
-
-    return buffer;
-}
-
 Client::Client( int fd ):
-    _fd(fd)
+    _fd(fd) 
 {
 
+}
+
+char Client::read_byte() const {
+    char buffer;
+    return (recv(_fd, &buffer, 1, 0) == -1) ? -1 : buffer;
+}
+
+std::string Client::read_str() const {
+    char buffer[64];
+    recv(_fd, buffer, 64, 0);
+
+    return buffer;
 }

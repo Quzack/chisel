@@ -15,12 +15,12 @@ Packet packet_from_id( const int id ) {
 }
 
 namespace client {
-Identify identify( const chisel::sock::Server* socket ) {
+Identify identify( const chisel::sock::Client& socket ) {
     return {
-        socket->read_byte(),
-        socket->read_str (),
-        socket->read_str (),
-        socket->read_byte()
+        socket.read_byte(),
+        socket.read_str (),
+        socket.read_str (),
+        socket.read_byte()
     };
 }
 }

@@ -25,6 +25,6 @@ struct Identify {
     unsigned int unused;
 };
 
-Identify identify( const chisel::sock::Server* );
+Identify identify( const chisel::sock::Client& );
 }
 }

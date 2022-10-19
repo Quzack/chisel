@@ -7,6 +7,9 @@ namespace chisel::sock {
 class Client {
 public:
     Client ( int );
+
+    char        read_byte() const;
+    std::string read_str () const;
 private:
     const int _fd;
 };
@@ -18,9 +21,7 @@ public:
 
     void listen_port( const int );
  
-    Client      accept_cl() const;
-    int         read_byte() const;
-    std::string read_str () const;
+    Client accept_cl() const;
 private:
     SOCKADDR_IN _addr;
     int         _fd;

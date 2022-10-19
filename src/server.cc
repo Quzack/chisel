@@ -42,9 +42,7 @@ void Server::start() {
 
     while(true) {
         auto client = _socket.accept_cl();
-        Player player(client, &_socket);
-
-        _players.push_back(player);
+        _players.push_back(Player(client, &_socket));
     }
 }
 
