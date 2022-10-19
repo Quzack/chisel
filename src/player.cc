@@ -20,13 +20,11 @@ Player::~Player() {
 void Player::tick( const Config* config ) {
     const unsigned int pId = _clSock.read_byte();
 
-    using packet::Packet;
-
     switch(packet::packet_from_id(pId)) {
-        case Packet::CS_AUTH: {
+        case packet::CS_AUTH: {
             auto data = packet::client::identify(_clSock);
         }
-        case Packet::UNKNOWN:
+        case packet::UNKNOWN:
             std::cout << "Unknown packet: " << pId << std::endl;
             break;
         default: 
