@@ -1,4 +1,5 @@
 #include <iostream>
+#include <algorithm>
 
 #include "player.h"
 #include "network/packet.h"
@@ -7,8 +8,7 @@ using chisel::Player;
 
 Player::Player( sock::Client clSock, sock::Server* srSock ):
     _clSock(clSock),
-    _srSock(srSock),
-    _active(true)
+    _srSock(srSock)
 {
 
 }
@@ -20,14 +20,14 @@ Player::~Player() {
 void Player::tick( const Config* config ) {
     const unsigned int pId = _clSock.read_byte();
 
-    switch(packet::packet_from_id(pId)) {
-        case packet::CS_AUTH: {
+    switch(pId) {
+        case 0x00: {
             auto data = packet::client::identify(_clSock);
+            // TODO 23/10/22: Send Identify queue action to server.
+            std::cout << data.username << std::endl;
         }
-        case packet::UNKNOWN:
-            std::cout << "Unknown packet: " << pId << std::endl;
-            break;
         default: 
+            std::cout << "Unknown packet: " << pId << std::endl;
             break;
     }
 }

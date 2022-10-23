@@ -6,6 +6,8 @@
 using chisel::sock::Server;
 using chisel::sock::Client;
 
+const uint8_t STR_BF_SZ = 64;
+
 Server::Server() {
 
 }
@@ -22,7 +24,7 @@ void Server::listen_port( const int port ) {
     SOCKADDR_IN addr;
     addr.sin_family = AF_INET;
     addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    addr.sin_port = htons(port); 
+    addr.sin_port = htons(port);
 
     this->_addr = addr;
 
@@ -51,9 +53,9 @@ char Client::read_byte() const {
     return (recv(_fd, &buffer, 1, 0) == -1) ? -1 : buffer;
 }
 
-std::string Client::read_str() const {
-    char buffer[64];
-    recv(_fd, buffer, 64, 0);
+char* Client::read_str() const {
+    char buffer[STR_BF_SZ];
+    recv(_fd, buffer, STR_BF_SZ, 0);
 
     return buffer;
 }

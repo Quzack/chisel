@@ -6,12 +6,10 @@
 
 #include "utils.h"
 
-namespace chisel::logger {
-enum LoggerLevel {
-    LL_INFO,
-    LL_WARN
-};
+#define LL_INFO 0
+#define LL_WARN 1
 
+namespace chisel::logger {
 class Logger {
 public:
     Logger ( std::string fileName ) {
@@ -22,16 +20,17 @@ public:
 
     ~Logger() { _file.close(); }
 
-    void log( LoggerLevel l, std::string&& m ) {
+    void log( const int l, std::string&& m ) {
         _file << "[" << current_date_time() << "] " << "(" << lv_prf(l) << "): " << m << std::endl;
     }
 private:
     std::ofstream _file;
 
-    std::string lv_prf( LoggerLevel l ) const {
+    std::string lv_prf( const int l ) const {
         switch(l) {
-            case LL_INFO: return "INFO";
-            case LL_WARN: return "WARN";
+            case 0:  return "INFO";
+            case 1:  return "WARN";
+            default: return "NONE";
         }
     }
 };

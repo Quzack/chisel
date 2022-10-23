@@ -3,6 +3,7 @@
 #include <fstream>
 #include <random>
 #include <time.h>
+#include <algorithm>
 
 inline bool file_exists( const char* name ) {
     FILE* file;if(file = fopen(name, "r")) {
@@ -38,4 +39,9 @@ inline std::string current_date_time() {
     strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tData);
     
     return buf;
+}
+
+inline std::string remove_empty( std::string str ) {
+    str.erase(std::remove(str.begin(), str.end(), ' '), str.end());
+    return str;
 }

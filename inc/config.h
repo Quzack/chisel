@@ -5,8 +5,7 @@
 
 namespace chisel {
 struct Config {
-    unsigned int port;
-    unsigned int maxPlayers;
+    unsigned int port, maxPlayers;
     std::string  name;
     bool         pub;
 

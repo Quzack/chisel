@@ -8,15 +8,16 @@
 
 #define TICK_INTERVAL 1000/20
 
-using chisel::Server;
+using chisel::server::Server;
 
 const std::string HEARTBEAT_URL = "http://www.classicube.net/server/heartbeat";
 
-Server::Server( Config* config ):
+Server::Server( Config* config, std::vector<std::string>* ops ):
     _salt      (rand_b62_str(16)),
     _config    (config),
     _logger    ("LOG_" + std::to_string(time(NULL)) + ".txt"),
-    _threadPool(_config->maxPlayers + 5)
+    _threadPool(_config->maxPlayers + 5),
+    _operators (ops)
 {
     _threadPool.start();
 }
@@ -29,7 +30,7 @@ Server::~Server() {
 
 void Server::start() {
     _socket.listen_port(_config->port);
-    _logger.log(logger::LL_INFO, "Listening for clients...");
+    _logger.log(LL_INFO, "Listening for clients...");
 
     _threadPool.queue([this] { this->start_heart(); });
 
@@ -61,7 +62,7 @@ void Server::start_heart() {
     http::Request req { url };
     
     const auto res = req.send();
-    _logger.log(logger::LL_INFO, "Server URL: " + std::string{ res.body.begin(), res.body.end() });
+    _logger.log(LL_INFO, "Server URL: " + std::string{ res.body.begin(), res.body.end() });
 
     while(true) {
         std::this_thread::sleep_for(std::chrono::seconds(45));
