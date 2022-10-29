@@ -4,13 +4,10 @@
 #include "server.h"
 #include "utils.h"
 #include "network/packet.h"
-#include "network/http.h"
 
 #define TICK_INTERVAL 1000/20
 
 using chisel::server::Server;
-
-const std::string HEARTBEAT_URL = "http://www.classicube.net/server/heartbeat";
 
 Server::Server( Config* config, std::vector<std::string>* ops ):
     _salt      (rand_b62_str(16)),
@@ -32,8 +29,6 @@ void Server::start() {
     _socket.listen_port(_config->port);
     _logger.log(LL_INFO, "Listening for clients...");
 
-    _threadPool.queue([this] { this->start_heart(); });
-
     _threadPool.queue([this] { 
         while(true) {
             std::this_thread::sleep_for(std::chrono::milliseconds(TICK_INTERVAL));
@@ -49,23 +44,11 @@ void Server::start() {
 
 void Server::tick() {
     for(auto& p : _players) {
-        p.tick(_config);
-    }
-}
+        if(p.active == false) {
+            // TODO 27/10/22: Removing player from vector.
+            continue;
+        }
 
-void Server::start_heart() {
-    auto url = HEARTBEAT_URL + _config->params()               + 
-        "&version=" + std::to_string(packet::PROTOCOL_VERSION) +
-        "&salt="    + _salt                                    + 
-        "&users="   + std::to_string(_players.size());
-    
-    http::Request req { url };
-    
-    const auto res = req.send();
-    _logger.log(LL_INFO, "Server URL: " + std::string{ res.body.begin(), res.body.end() });
-
-    while(true) {
-        std::this_thread::sleep_for(std::chrono::seconds(45));
-        req.send();
+        p.tick(_config, _operators);
     }
 }

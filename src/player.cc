@@ -17,14 +17,29 @@ Player::~Player() {
 
 }
 
-void Player::tick( const Config* config ) {
+void Player::tick( 
+    const Config*                   config,
+    const std::vector<std::string>* ops
+) {
+    if(!ping()) {
+        active = false;
+        return;
+    }
+
     const unsigned int pId = _clSock.read_byte();
 
     switch(pId) {
         case 0x00: {
             auto data = packet::client::identify(_clSock);
-            // TODO 23/10/22: Send Identify queue action to server.
-            std::cout << data.username << std::endl;
+            this->_op = std::find(ops->begin(), ops->end(), data.username) != ops->end();
+            
+            /*
+            packet::server::Identify(
+                config->name,
+                config->motd,
+                _op
+            ).send_to(_clSock.get_fd());
+            */
         }
         default: 
             std::cout << "Unknown packet: " << pId << std::endl;
@@ -38,4 +53,8 @@ void Player::kick( std::string reason ) const {
 
 void Player::send_msg( std::string msg ) const {
     // TODO 28/9/22: Send 0x0d packet.
+}
+
+bool Player::ping() const {
+    return packet::Packet(0x01).send_to(_clSock.get_fd()) != -1;
 }

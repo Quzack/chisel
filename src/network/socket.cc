@@ -2,11 +2,10 @@
 #include <vector>
 
 #include "network/socket.h"
+#include "network/packet.h"
 
 using chisel::sock::Server;
 using chisel::sock::Client;
-
-const uint8_t STR_BF_SZ = 64;
 
 Server::Server() {
 
@@ -53,9 +52,9 @@ char Client::read_byte() const {
     return (recv(_fd, &buffer, 1, 0) == -1) ? -1 : buffer;
 }
 
-char* Client::read_str() const {
-    char buffer[STR_BF_SZ];
-    recv(_fd, buffer, STR_BF_SZ, 0);
+std::string Client::read_str() const {
+    char buffer[packet::STR_BF_SZ];
+    recv(_fd, buffer, packet::STR_BF_SZ, 0x8);
 
-    return buffer;
+    return std::string(buffer);
 }

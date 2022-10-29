@@ -26,7 +26,6 @@ private:
     std::vector<Player>       _players;
     std::vector<std::string>* _operators;
 
-    void tick       ();
-    void start_heart();
+    void tick();
 };
 }

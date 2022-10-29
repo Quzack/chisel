@@ -9,11 +9,15 @@
 namespace chisel {
 class Player {
 public:
+    bool active = true;
+
     Player ( sock::Client, sock::Server* );
     ~Player();
 
-    void tick( const Config* );
-    void s_op( bool op ) { this->_op = op; }
+    void tick( 
+        const Config*,
+        const std::vector<std::string>*
+    );
 
     void kick    ( std::string ) const;
     void send_msg( std::string ) const;
@@ -21,7 +25,8 @@ public:
 private:
     const sock::Client  _clSock;
     const sock::Server* _srSock;
-    bool                _active = true;
-    bool                _op     = false;
+    bool                _op = false;
+
+    bool ping() const;
 };
 }

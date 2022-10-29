@@ -6,11 +6,8 @@
 namespace chisel {
 struct Config {
     unsigned int port, maxPlayers;
-    std::string  name;
-    bool         pub;
-
-    std::string params() const;
-
+    std::string name, motd;
+    
     static void   create_new();
     static Config from_file ( std::ifstream& );
 };

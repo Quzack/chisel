@@ -9,7 +9,7 @@ using chisel::Config;
 #define OP_FILE "op-list.txt"
 
 void create_files() {
-    if(!file_exists("config.txt")) {
+    if(!file_exists("config.cfg")) {
         Config::create_new();
     }
     

@@ -4,20 +4,13 @@
 
 using chisel::Config;
 
-std::string Config::params() const {
-    return "?port="    + std::to_string(port)      + 
-            "&max="    + std::to_string(maxPlayers) + 
-            "&name="   + name                       + 
-            "&public=" + (pub ? "True" : "False");
-}
-
 void Config::create_new() {
-    std::ofstream file("config.txt");
+    std::ofstream file("config.cfg");
     
-    file << "port: " << 25565 << std::endl;
-    file << "max-players: 20" << std::endl;
-    file << "name: MyServer"  << std::endl;
-    file << "public: false"   << std::endl; 
+    file << "port: " << 25565           << std::endl;
+    file << "max-players: 20"           << std::endl;
+    file << "name: GenericName"         << std::endl;
+    file << "motd: A Minecraft server." << std::endl; 
 
     file.close();
 }
@@ -32,7 +25,7 @@ Config Config::from_file( std::ifstream& file ) {
         if     (line.find("port")        != -1) sin >> config.port;
         else if(line.find("max-players") != -1) sin >> config.maxPlayers;
         else if(line.find("name")        != -1) sin >> config.name;
-        else if(line.find("public")      != -1) sin >> config.pub; 
+        else if(line.find("motd")        != -1) sin >> config.motd;
     }
 
     return config;

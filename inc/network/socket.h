@@ -8,8 +8,9 @@ class Client {
 public:
     Client ( int );
 
-    char  read_byte() const;
-    char* read_str () const;
+    char        read_byte() const;
+    std::string read_str () const;
+    int         get_fd   () const { return this->_fd; }
 private:
     const int _fd;
 };
