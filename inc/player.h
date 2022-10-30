@@ -19,14 +19,15 @@ public:
         const std::vector<std::string>*
     );
 
-    void kick    ( std::string ) const;
-    void send_msg( std::string ) const;
-    bool is_op   ()              const { return this->_op; }
+    void disconnect( std::string ) const;
+    void send_msg  ( std::string ) const;
+    bool is_op     ()              const { return this->_op; }
 private:
     const sock::Client  _clSock;
     const sock::Server* _srSock;
     bool                _op = false;
 
-    bool ping() const;
+    void send_serv_idt( const std::string&, const std::string& ) const;
+    bool ping         ()                                         const;
 };
 }

@@ -13,23 +13,13 @@ class Packet {
 public:
     Packet( const unsigned char );
 
-    int send_to( const int ) const;
-protected:
-    void write_byte( const char );
+    void write_byte( const unsigned char );
     void write_str ( const std::string );
+
+    int send_to( const int ) const;
 private:
     std::vector<char> _buffer;
 };
-
-namespace server {
-struct Identify : public Packet {
-    Identify( 
-        const std::string&, 
-        const std::string&,
-        bool 
-    );
-};
-}
 
 namespace client {
 struct Identify {

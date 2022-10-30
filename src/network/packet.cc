@@ -9,11 +9,7 @@ Packet::Packet( const unsigned char id ) {
     write_byte(id);
 }
 
-int Packet::send_to( const int fd ) const {
-    return send(fd, &_buffer[0], _buffer.size(), 0);
-}
-
-void Packet::write_byte( const char byte ) {
+void Packet::write_byte( const unsigned char byte ) {
     _buffer.push_back(byte);
 }
 
@@ -30,19 +26,8 @@ void Packet::write_str( const std::string str ) {
     }
 }
 
-namespace server {
-Identify::Identify( 
-    const std::string& name,
-    const std::string& motd,
-    bool op 
-):
-    Packet(0x00)
-{
-    write_byte(PROTOCOL_VERSION);
-    write_str (name);
-    write_str (motd);
-    write_byte(op ? 0x64 : 0x00);
-}
+int Packet::send_to( const int fd ) const {
+    send(fd, &_buffer[0], _buffer.size(), 0);
 }
 
 namespace client {

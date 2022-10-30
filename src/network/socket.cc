@@ -7,6 +7,28 @@
 using chisel::sock::Server;
 using chisel::sock::Client;
 
+Client::Client( int fd ):
+    _fd(fd)
+{
+
+}
+
+int Client::send_pckt( const packet::Packet& packet ) const {
+    packet.send_to(_fd);
+}
+
+char Client::read_byte() const {
+    char buffer;
+    return (recv(_fd, &buffer, 1, 0) == -1) ? -1 : buffer;
+}
+
+std::string Client::read_str() const {
+    char buffer[packet::STR_BF_SZ];
+    recv(_fd, buffer, packet::STR_BF_SZ, 0x8);
+    
+    return std::string(buffer);
+}
+
 Server::Server() {
 
 }
@@ -39,22 +61,4 @@ Client Server::accept_cl() const {
     const int fd = accept(_fd, (LPSOCKADDR) &_addr, &size);
 
     return Client(fd);
-}
-
-Client::Client( int fd ):
-    _fd(fd) 
-{
-
-}
-
-char Client::read_byte() const {
-    char buffer;
-    return (recv(_fd, &buffer, 1, 0) == -1) ? -1 : buffer;
-}
-
-std::string Client::read_str() const {
-    char buffer[packet::STR_BF_SZ];
-    recv(_fd, buffer, packet::STR_BF_SZ, 0x8);
-
-    return std::string(buffer);
 }
