@@ -4,20 +4,19 @@
 #include <vector>
 
 #include "config.h"
+#include "server.h"
 #include "network/socket.h"
 
 namespace chisel {
 class Player {
 public:
-    bool active = true;
+    bool        active = true;
+    std::string name;
 
-    Player ( sock::Client, sock::Server* );
+    Player ( sock::Client, sock::Server*, server::Server* );
     ~Player();
 
-    void tick( 
-        const Config*,
-        const std::vector<std::string>*
-    );
+    void tick();
 
     void disconnect( std::string ) const;
     void send_msg  ( std::string ) const;
@@ -25,6 +24,7 @@ public:
 private:
     const sock::Client  _clSock;
     const sock::Server* _srSock;
+    server::Server*     _server;
     bool                _op = false;
 
     void send_serv_idt( const std::string&, const std::string& ) const;

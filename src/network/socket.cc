@@ -13,8 +13,8 @@ Client::Client( int fd ):
 
 }
 
-int Client::send_pckt( const packet::Packet& packet ) const {
-    packet.send_to(_fd);
+int Client::send_pckt( const std::vector<char>& data ) const {
+    send(_fd, &data[0], data.size(), 0);
 }
 
 char Client::read_byte() const {

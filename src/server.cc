@@ -11,10 +11,10 @@ using chisel::server::Server;
 
 Server::Server( Config* config, std::vector<std::string>* ops ):
     _salt      (rand_b62_str(16)),
-    _config    (config),
     _logger    ("LOG_" + std::to_string(time(NULL)) + ".txt"),
-    _threadPool(_config->maxPlayers + 5),
-    _operators (ops)
+    _threadPool(config->maxPlayers + 5),
+    config     (config),
+    operators  (ops)
 {
     _threadPool.start();
 }
@@ -22,11 +22,11 @@ Server::Server( Config* config, std::vector<std::string>* ops ):
 Server::~Server() {
     _threadPool.stop();
 
-    delete _config;
+    delete config;
 }
 
 void Server::start() {
-    _socket.listen_port(_config->port);
+    _socket.listen_port(config->port);
     _logger.log(LL_INFO, "Listening for clients...");
 
     _threadPool.queue([this] { 
@@ -38,7 +38,7 @@ void Server::start() {
 
     while(true) {
         auto client = _socket.accept_cl();
-        _players.push_back(Player(client, &_socket));
+        _players.push_back(Player(client, &_socket, this));
     }
 }
 
@@ -49,6 +49,6 @@ void Server::tick() {
             continue;
         }
 
-        p.tick(_config, _operators);
+        p.tick();
     }
 }

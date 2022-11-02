@@ -12,7 +12,7 @@ public:
 
     char        read_byte()                        const;
     std::string read_str ()                        const;
-    int send_pckt        ( const packet::Packet& ) const;
+    int send_pckt        ( const std::vector<char>& ) const;
 private:
     const int _fd;
 };

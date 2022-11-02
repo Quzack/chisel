@@ -16,7 +16,7 @@ public:
     void write_byte( const unsigned char );
     void write_str ( const std::string );
 
-    int send_to( const int ) const;
+    std::vector<char>& get_data() { return this->_buffer; }
 private:
     std::vector<char> _buffer;
 };

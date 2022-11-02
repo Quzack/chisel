@@ -10,21 +10,22 @@
 #include "player.h"
 
 namespace chisel::server {
-// TODO 23/10/22: Implement server queue mechanics.
 class Server {
 public:
+    std::vector<std::string>* operators;
+    Config*                   config;
+
     Server ( Config*, std::vector<std::string>* );
     ~Server();
             
-    void start();
+    void                      start      ();
+    std::vector<Player>&      get_players() { return this->_players; }
 private:
     std::string               _salt;
-    Config*                   _config;
     sock::Server              _socket;
     logger::Logger            _logger;
     thread::ThreadPool        _threadPool;
     std::vector<Player>       _players;
-    std::vector<std::string>* _operators;
 
     void tick();
 };

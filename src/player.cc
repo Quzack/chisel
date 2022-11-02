@@ -1,14 +1,19 @@
 #include <iostream>
-#include <algorithm>
 
+#include "utils.h"
 #include "player.h"
 #include "network/packet.h"
 
 using chisel::Player;
 
-Player::Player( sock::Client clSock, sock::Server* srSock ):
+Player::Player( 
+    sock::Client    clSock, 
+    sock::Server*   srSock, 
+    server::Server* server 
+):
     _clSock(clSock),
-    _srSock(srSock)
+    _srSock(srSock),
+    _server(server)
 {
 
 }
@@ -17,10 +22,7 @@ Player::~Player() {
 
 }
 
-void Player::tick( 
-    const Config*                   config,
-    const std::vector<std::string>* ops
-) {
+void Player::tick() {
     if(!ping()) {
         active = false;
         return;
@@ -31,19 +33,18 @@ void Player::tick(
     switch(pId) {
         case 0x00: {
             auto data = packet::client::identify(_clSock);
-            this->_op = std::find(ops->begin(), ops->end(), data.username) != ops->end();
-            
-            if(data.protocolVer != packet::PROTOCOL_VERSION) {
-                disconnect("Unsupported protocol version.");
-                return;
+            this->_op = itm_in_vec(*_server->operators, data.username);
+
+            send_serv_idt(_server->config->name, _server->config->motd);
+
+            for(auto& player : _server->get_players()) {
+                if(player.name != data.username) continue;
+                disconnect("Player already on the server."); 
             }
 
-            if(data.username.length() > 16 || data.username.length() < 4) {
-                disconnect("Invalid username.");
-                return;
-            }
+            this->name = data.username;
 
-            send_serv_idt(config->name, config->motd);
+            // TODO 3/11/2022: Send world.
         }
         default: 
             std::cout << "Unknown packet: " << pId << std::endl;
@@ -66,9 +67,9 @@ void Player::send_serv_idt( const std::string& name, const std::string& motd ) c
     sIdentify.write_str (motd);
     sIdentify.write_byte(_op ? 0x64 : 0x00);
 
-    _clSock.send_pckt(sIdentify);
+    _clSock.send_pckt(sIdentify.get_data());
 }
 
 bool Player::ping() const {
-    return _clSock.send_pckt(packet::Packet(0x01));
+    return _clSock.send_pckt(packet::Packet(0x01).get_data());
 }

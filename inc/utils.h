@@ -45,3 +45,8 @@ inline std::string remove_empty( std::string str ) {
     str.erase(std::remove(str.begin(), str.end(), ' '), str.end());
     return str;
 }
+
+template<typename T>
+inline bool itm_in_vec( std::vector<T>& vec, T& itm ) {
+    return std::find(vec.begin(), vec.end(), itm) != vec.end();
+}
