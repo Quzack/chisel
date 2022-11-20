@@ -6,8 +6,11 @@
 #include <algorithm>
 
 inline bool file_exists( const char* name ) {
-    FILE* file;if(file = fopen(name, "r")) {
-        fclose(file);return true;
+    FILE* file;
+    
+    if(file = fopen(name, "r")) {
+        fclose(file);
+        return true;
     }
 
     return false;
@@ -47,6 +50,6 @@ inline std::string remove_empty( std::string str ) {
 }
 
 template<typename T>
-inline bool itm_in_vec( std::vector<T>& vec, T& itm ) {
-    return std::find(vec.begin(), vec.end(), itm) != vec.end();
+inline bool obj_in_vec( std::vector<T>& vec, T& obj ) {
+    return std::find(vec.begin(), vec.end(), obj) != vec.end();
 }

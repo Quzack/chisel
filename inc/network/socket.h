@@ -3,15 +3,13 @@
 #include <winsock2.h>
 #include <string>
 
-#include "network/packet.h"
-
 namespace chisel::sock {
 class Client {
 public:
     Client ( int );
 
-    char        read_byte()                        const;
-    std::string read_str ()                        const;
+    char        read_byte()                           const;
+    std::string read_str ()                           const;
     int send_pckt        ( const std::vector<char>& ) const;
 private:
     const int _fd;

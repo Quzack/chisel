@@ -7,9 +7,9 @@
 
 #define TICK_INTERVAL 1000/20
 
-using chisel::server::Server;
+using chisel::Server;
 
-Server::Server( Config* config, std::vector<std::string>* ops ):
+Server::Server( chisel::Config* config, std::vector<std::string>* ops ):
     _salt      (rand_b62_str(16)),
     _logger    ("LOG_" + std::to_string(time(NULL)) + ".txt"),
     _threadPool(config->maxPlayers + 5),
@@ -37,8 +37,7 @@ void Server::start() {
     });
 
     while(true) {
-        auto client = _socket.accept_cl();
-        _players.push_back(Player(client, &_socket, this));
+        _players.push_back(Player(_socket.accept_cl(), &_socket, this));
     }
 }
 

@@ -33,11 +33,10 @@ std::vector<std::string> read_ops() {
 int main(int argc, char** argv) {
     create_files();
 
-    std::ifstream configFile("config.txt");
+    std::ifstream configFile("config.cfg");
     Config config = Config::from_file(configFile);
 
     auto ops = read_ops();
 
-    chisel::server::Server server(&config, &ops);
-    server.start();
+    chisel::Server(&config, &ops).start();
 }

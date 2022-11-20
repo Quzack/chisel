@@ -26,10 +26,6 @@ void Packet::write_str( const std::string str ) {
     }
 }
 
-int Packet::send_to( const int fd ) const {
-    send(fd, &_buffer[0], _buffer.size(), 0);
-}
-
 namespace client {
 Identify identify( const chisel::sock::Client& socket ) {
     return {

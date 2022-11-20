@@ -2,14 +2,15 @@
 
 #include "utils.h"
 #include "player.h"
+#include "server.h"
 #include "network/packet.h"
 
 using chisel::Player;
 
 Player::Player( 
-    sock::Client    clSock, 
-    sock::Server*   srSock, 
-    server::Server* server 
+    sock::Client  clSock, 
+    sock::Server* srSock,
+    Server*       server 
 ):
     _clSock(clSock),
     _srSock(srSock),
@@ -33,7 +34,7 @@ void Player::tick() {
     switch(pId) {
         case 0x00: {
             auto data = packet::client::identify(_clSock);
-            this->_op = itm_in_vec(*_server->operators, data.username);
+            this->_op = obj_in_vec(*_server->operators, data.username);
 
             send_serv_idt(_server->config->name, _server->config->motd);
 

@@ -3,17 +3,16 @@
 #include <string>
 #include <vector>
 
-#include "config.h"
-#include "server.h"
 #include "network/socket.h"
 
 namespace chisel {
+class Server;
 class Player {
 public:
     bool        active = true;
     std::string name;
 
-    Player ( sock::Client, sock::Server*, server::Server* );
+    Player ( sock::Client, sock::Server*, Server* );
     ~Player();
 
     void tick();
@@ -24,7 +23,7 @@ public:
 private:
     const sock::Client  _clSock;
     const sock::Server* _srSock;
-    server::Server*     _server;
+    Server*             _server;
     bool                _op = false;
 
     void send_serv_idt( const std::string&, const std::string& ) const;

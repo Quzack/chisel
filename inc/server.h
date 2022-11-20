@@ -9,23 +9,23 @@
 #include "thread/thread_pool.h"
 #include "player.h"
 
-namespace chisel::server {
+namespace chisel {
 class Server {
 public:
     std::vector<std::string>* operators;
-    Config*                   config;
+    chisel::Config*           config;
 
-    Server ( Config*, std::vector<std::string>* );
+    Server ( chisel::Config*, std::vector<std::string>* );
     ~Server();
             
-    void                      start      ();
-    std::vector<Player>&      get_players() { return this->_players; }
+    void                         start      ();
+    std::vector<chisel::Player>& get_players() { return this->_players; }
 private:
-    std::string               _salt;
-    sock::Server              _socket;
-    logger::Logger            _logger;
-    thread::ThreadPool        _threadPool;
-    std::vector<Player>       _players;
+    std::string                 _salt;
+    sock::Server                _socket;
+    logger::Logger              _logger;
+    thread::ThreadPool          _threadPool;
+    std::vector<chisel::Player> _players;
 
     void tick();
 };
