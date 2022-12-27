@@ -34,6 +34,7 @@ void Player::tick() {
     switch(pId) {
         case 0x00: {
             auto data = packet::client::identify(_clSock);
+            
             this->_op = obj_in_vec(*_server->operators, data.username);
 
             send_serv_idt(_server->config->name, _server->config->motd);
