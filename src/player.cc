@@ -46,7 +46,7 @@ void Player::tick() {
 
             this->name = data.username;
 
-            // TODO 3/11/2022: Send world.
+            // TODO 9/2/2023: Send world data.
         }
         default: 
             std::cout << "Unknown packet: " << pId << std::endl;

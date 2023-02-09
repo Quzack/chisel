@@ -7,6 +7,7 @@
 #include "logger.h"
 #include "network/socket.h"
 #include "thread/thread_pool.h"
+#include "model/world.h"
 #include "player.h"
 
 namespace chisel {
@@ -14,6 +15,7 @@ class Server {
 public:
     std::vector<std::string>* operators;
     chisel::Config*           config;
+    World                     world;
 
     Server ( chisel::Config*, std::vector<std::string>* );
     ~Server();
