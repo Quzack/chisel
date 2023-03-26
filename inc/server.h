@@ -17,7 +17,11 @@ public:
     chisel::Config*           config;
     World                     world;
 
-    Server ( chisel::Config*, std::vector<std::string>* );
+    Server(
+        chisel::Config*, 
+        std::vector<std::string>*,
+        World
+    );
     ~Server();
             
     void                         start      ();

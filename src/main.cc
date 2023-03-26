@@ -38,5 +38,9 @@ int main(int argc, char** argv) {
 
     auto ops = read_ops();
 
-    chisel::Server(&config, &ops).start();
+    chisel::Server(
+        &config, 
+        &ops, 
+        chisel::World::create_new()
+    ).start();
 }

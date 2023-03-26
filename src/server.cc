@@ -9,12 +9,17 @@
 
 using chisel::Server;
 
-Server::Server( chisel::Config* config, std::vector<std::string>* ops ):
+Server::Server( 
+    chisel::Config* config, 
+    std::vector<std::string>* ops,
+    World world
+):
     _salt      (rand_b62_str(16)),
     _logger    ("LOG_" + std::to_string(time(NULL)) + ".txt"),
     _threadPool(config->maxPlayers + 5),
     config     (config),
-    operators  (ops)
+    operators  (ops),
+    world      (world)
 {
     _threadPool.start();
 }
