@@ -1,8 +1,4 @@
-#pragma once
-
-#ifndef ZLIB_CONST
-#define ZLIB_CONST
-#endif
+#include <gzip/config.h>
 
 // zlib
 #include <zlib.h>

@@ -4,6 +4,7 @@
 #include "player.h"
 #include "server.h"
 #include "network/packet.h"
+#include "gzip/compress.h"
 
 using chisel::Player;
 
@@ -46,7 +47,7 @@ void Player::tick() {
 
             this->name = data.username;
 
-            // TODO 9/2/2023: Send world data.
+            send_wrld_data(_server->world);
         }
         default: 
             std::cout << "Unknown packet: " << pId << std::endl;
@@ -72,6 +73,18 @@ void Player::send_serv_idt( const std::string& name, const std::string& motd ) c
     _clSock.send_pckt(sIdentify.get_data());
 }
 
+void Player::send_wrld_data( const World& world ) const {
+    _clSock.send_pckt({0x02}); // LEVEL INIT.
+    std::string data = gzip::compress(&world.blocks[0], world.blocks.size());
+
+    int dsize = data.size();
+    int i = (dsize % CHUNK_LENGTH == 0) ? dsize/CHUNK_LENGTH : (dsize - (dsize % CHUNK_LENGTH))/CHUNK_LENGTH;
+
+    for(int j = 0; j < i; j++) {
+        // ........................................
+    }
+}
+
 bool Player::ping() const {
-    return _clSock.send_pckt(packet::Packet(0x01).get_data());
+    return _clSock.send_pckt({0x01});
 }

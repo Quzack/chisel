@@ -7,20 +7,22 @@
 #include "location.h"
 
 namespace chisel {
+const uint16_t CHUNK_LENGTH = 1024;
+
 struct World {
     uint16_t           length, width, height;
     Location           spawn;
-    std::vector<Block> blocks;
+    std::vector<char>  blocks;
 
     static World create_new(
         uint16_t len    = 100, 
         uint16_t width  = 100, 
-        uint16_t height = 10
+        uint16_t height = 100
     ) {
         World world { 
             len, width, height, 
             { len/2, width/2, height/2 },
-            std::vector<chisel::Block>(len * width * height, AIR)
+            std::vector<char>(len * width * height, AIR)
         };
 
         world.gen_flat_wrld();

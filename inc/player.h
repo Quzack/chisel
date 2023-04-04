@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "network/socket.h"
+#include "model/world.h"
 
 namespace chisel {
 class Server;
@@ -26,7 +27,8 @@ private:
     Server*             _server;
     bool                _op = false;
 
-    void send_serv_idt( const std::string&, const std::string& ) const;
-    bool ping         ()                                         const;
+    void send_serv_idt ( const std::string&, const std::string& ) const;
+    void send_wrld_data( const World& )                           const;
+    bool ping          ()                                         const;
 };
 }
