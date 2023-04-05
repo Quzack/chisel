@@ -5,6 +5,7 @@
 
 #include "network/socket.h"
 #include "model/world.h"
+#include "model/location.h"
 
 namespace chisel {
 class Server;
@@ -17,6 +18,7 @@ public:
     ~Player();
 
     void tick();
+    void teleport( Location );
 
     void disconnect( std::string ) const;
     void send_msg  ( std::string ) const;
@@ -28,7 +30,6 @@ private:
     bool                _op = false;
 
     void send_serv_idt ( const std::string&, const std::string& ) const;
-    void send_wrld_data( const World& )                           const;
     bool ping          ()                                         const;
 };
 }

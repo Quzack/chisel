@@ -26,6 +26,16 @@ void Packet::write_str( const std::string str ) {
     }
 }
 
+void Packet::write_short( const signed short int i ) {
+    _buffer.push_back((signed short int) i);
+}
+
+void Packet::write_barray( const std::vector<char> array ) {
+    for(int i = 0; i < 1024; i++) {
+        write_byte(array[i]);
+    }
+} 
+
 namespace client {
 Identify identify( const chisel::sock::Client& socket ) {
     return {

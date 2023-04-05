@@ -13,8 +13,10 @@ class Packet {
 public:
     Packet( const unsigned char );
 
-    void write_byte( const unsigned char );
-    void write_str ( const std::string );
+    void write_byte  ( const unsigned char );
+    void write_str   ( const std::string );
+    void write_short ( const signed short int );
+    void write_barray( const std::vector<char> );
 
     std::vector<char>& get_data() { return this->_buffer; }
 private:
