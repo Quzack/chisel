@@ -36,14 +36,12 @@ void Packet::write_barray( const std::vector<char> array ) {
     }
 } 
 
-namespace client {
-Identify identify( const chisel::sock::Client& socket ) {
+Identify identify_cl( const chisel::sock::Client& socket ) {
     return {
         socket.read_byte(),
         remove_empty(socket.read_str()),
         remove_empty(socket.read_str()),
         socket.read_byte()
     };
-}
 }
 }

@@ -41,6 +41,6 @@ int main(int argc, char** argv) {
     chisel::Server(
         &config, 
         &ops, 
-        chisel::World::create_new()
+        chisel::World::create_new(100, 100, 100)
     ).start();
 }

@@ -23,13 +23,11 @@ private:
     std::vector<char> _buffer;
 };
 
-namespace client {
 struct Identify {
     unsigned int protocolVer;
     std::string  username, key;
     unsigned int unused;
 };
 
-Identify identify( const chisel::sock::Client& );
-}
+Identify identify_cl( const chisel::sock::Client& );
 }

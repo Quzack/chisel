@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 #include "config.h"
 #include "logger.h"
@@ -13,10 +14,6 @@
 namespace chisel {
 class Server {
 public:
-    std::vector<std::string>* operators;
-    chisel::Config*           config;
-    World                     world;
-
     Server(
         chisel::Config*, 
         std::vector<std::string>*,
@@ -24,15 +21,20 @@ public:
     );
     ~Server();
             
-    void                         start      ();
-    std::vector<chisel::Player>& get_players() { return this->_players; }
+    void start();
 private:
+    std::vector<std::string>*   _operators;
+    chisel::Config*             _config;
     std::string                 _salt;
     sock::Server                _socket;
     logger::Logger              _logger;
     thread::ThreadPool          _threadPool;
     std::vector<chisel::Player> _players;
+    World                       _world;
 
-    void tick();
+    void tick          ();
+    void tick_player   ( chisel::Player& );
+
+    void send_serv_idt ( const sock::Client&, bool op ) const;
 };
 }

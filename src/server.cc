@@ -1,5 +1,6 @@
 #include <random>
 #include <time.h>
+#include <iostream>
 
 #include "server.h"
 #include "utils.h"
@@ -16,22 +17,20 @@ Server::Server(
 ):
     _salt      (rand_b62_str(16)),
     _logger    ("LOG_" + std::to_string(time(NULL)) + ".txt"),
+    _world     (world),
     _threadPool(config->maxPlayers + 5),
-    config     (config),
-    operators  (ops),
-    world      (world)
+    _config    (config),
+    _operators (ops)
 {
     _threadPool.start();
 }
 
 Server::~Server() {
     _threadPool.stop();
-
-    delete config;
 }
 
 void Server::start() {
-    _socket.listen_port(config->port);
+    _socket.listen_port(_config->port);
     _logger.log(LL_INFO, "Listening for clients...");
 
     _threadPool.queue([this] { 
@@ -42,7 +41,7 @@ void Server::start() {
     });
 
     while(true) {
-        _players.push_back(Player(_socket.accept_cl(), &_socket, this));
+        _players.push_back(Player(_socket.accept_cl()));
     }
 }
 
@@ -53,6 +52,36 @@ void Server::tick() {
             continue;
         }
 
-        p.tick();
+        tick_player(p);
+    }
+}
+
+void Server::tick_player( chisel::Player& player ) {
+    if(!player.ping()) {
+        player.active = false;
+        return;
+    }
+
+    unsigned int pId = player.socket().read_byte();
+
+    switch(pId) {
+        case 0x00: {
+            auto data = packet::identify_cl(player.socket());
+
+            player.op = obj_in_vec(*_operators, data.username);
+            send_serv_idt(player.socket(), player.op);
+
+            for(auto& player : _players) {
+                if(player.name != data.username) continue;
+                player.disconnect("Player already on the server."); 
+            }
+
+            player.name = data.username;
+            _logger.log(LL_INFO, player.name + " is connecting...");
+            _world.join(player.socket());
+        }
+        default: 
+            std::cout << "Unknown packet: " << pId << std::endl;
+            break;
     }
 }

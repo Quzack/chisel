@@ -1,10 +1,8 @@
 #pragma once
 
 #include <string>
-#include <vector>
 
 #include "network/socket.h"
-#include "model/world.h"
 #include "model/location.h"
 
 namespace chisel {
@@ -12,24 +10,19 @@ class Server;
 class Player {
 public:
     bool        active = true;
+    bool        op     = false;
     std::string name;
 
-    Player ( sock::Client, sock::Server*, Server* );
+    Player ( sock::Client );
     ~Player();
 
-    void tick();
     void teleport( Location );
 
-    void disconnect( std::string ) const;
-    void send_msg  ( std::string ) const;
-    bool is_op     ()              const { return this->_op; }
+    void disconnect    ( std::string ) const;
+    void send_msg      ( std::string ) const;
+    bool ping          ()              const;
+    sock::Client socket()              const { return this->_socket; }
 private:
-    const sock::Client  _clSock;
-    const sock::Server* _srSock;
-    Server*             _server;
-    bool                _op = false;
-
-    void send_serv_idt ( const std::string&, const std::string& ) const;
-    bool ping          ()                                         const;
+    const sock::Client  _socket;
 };
 }
