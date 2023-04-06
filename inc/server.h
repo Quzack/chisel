@@ -35,6 +35,7 @@ private:
     void tick          ();
     void tick_player   ( chisel::Player& );
 
-    void send_serv_idt ( const sock::Client&, bool op ) const;
+    void send_serv_idt  ( const sock::Client&, bool ) const;
+    bool player_id_exist( const int8_t )              const;
 };
 }

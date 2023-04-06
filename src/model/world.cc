@@ -24,17 +24,21 @@ World World::create_new( uint16_t l, uint16_t h, uint16_t w ) {
     return world;
 } 
 
-void World::join( const sock::Client& client ) const {
-    client.send_pckt({0x02}); // LEVEL INIT.
-    snd_chunk_data(client);   // CHUNK DATA.
+void World::join( const chisel::Player& player ) const {
+    player.socket().send_pckt({0x02}); // LEVEL INIT.
+    snd_chunk_data(player.socket());   // CHUNK DATA.
 
     packet::Packet finalize(0x04);
     finalize.write_short(_length);
     finalize.write_short(_height);
     finalize.write_short(_width);
 
-    client.send_pckt(finalize.get_data()); // LEVEL FINALIZE.
+    player.socket().send_pckt(finalize.get_data()); // LEVEL FINALIZE.
     // TODO 5/4/2023: Spawn player.
+    packet::Packet spawnPk(0x07);
+    spawnPk.write_sbyte   (player.id());
+    spawnPk.write_str     (player.name);
+    
 }
 
 void World::gen_flat_world() {

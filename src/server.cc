@@ -41,7 +41,10 @@ void Server::start() {
     });
 
     while(true) {
-        _players.push_back(Player(_socket.accept_cl()));
+        int8_t pId;
+        do {  pId = rand_no(-127, 127); } while(player_id_exist(pId));
+
+        _players.push_back(Player(_socket.accept_cl(), pId));
     }
 }
 
@@ -79,7 +82,7 @@ void Server::tick_player( chisel::Player& player ) {
             player.name = data.username;
 
             _logger.log(LL_INFO, player.name + " is connecting...");
-            _world.join(player.socket());
+            _world.join(player);
         }
         default: 
             std::cout << "Unknown packet: " << pId << std::endl;
@@ -95,4 +98,11 @@ void Server::send_serv_idt( const sock::Client& client, bool op ) const {
     idt.write_byte    (op ? 0x64 : 0x00);
 
     client.send_pckt(idt.get_data());
+}
+
+bool Server::player_id_exist( const int8_t id ) const {
+    for(auto& player : _players) {
+        if(player.id() == id) return true;
+    }
+    return false;
 }

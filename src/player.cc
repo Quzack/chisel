@@ -2,8 +2,9 @@
 
 using chisel::Player;
 
-Player::Player( sock::Client socket ):
-    _socket(socket)
+Player::Player( sock::Client socket, const int8_t id ):
+    _socket(socket),
+    _id    (id)
 {
 
 }

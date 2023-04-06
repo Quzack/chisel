@@ -14,6 +14,7 @@ public:
     Packet( const unsigned char );
 
     void write_byte  ( const unsigned char );
+    void write_sbyte ( const signed char );
     void write_str   ( const std::string );
     void write_short ( const signed short int );
     void write_barray( const std::vector<char> );

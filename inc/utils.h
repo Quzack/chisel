@@ -16,6 +16,14 @@ inline bool file_exists( const char* name ) {
     return false;
 }
 
+inline int rand_no( const int x, const int y ) {
+    static std::random_device rd; 
+    static std::mt19937 eng(rd()); 
+    static std::uniform_int_distribution<> distr(x, y); 
+
+    return distr(eng);
+}
+
 inline std::string rand_b62_str( int len ) {
     auto& chrs = "0123456789"
         "abcdefghijklmnopqrstuvwxyz"

@@ -13,7 +13,7 @@ public:
     bool        op     = false;
     std::string name;
 
-    Player ( sock::Client );
+    Player ( sock::Client, const int8_t );
     ~Player();
 
     void teleport( Location );
@@ -22,7 +22,9 @@ public:
     void send_msg      ( std::string ) const;
     bool ping          ()              const;
     sock::Client socket()              const { return this->_socket; }
+    int8_t id          ()              const { return this->_id; }
 private:
     const sock::Client  _socket;
+    const int8_t        _id;
 };
 }
