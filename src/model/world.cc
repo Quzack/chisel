@@ -38,7 +38,7 @@ void World::join( const chisel::Player& player ) const {
     packet::Packet spawnPk(0x07);
     spawnPk.write_sbyte   (player.id());
     spawnPk.write_str     (player.name);
-    
+
 }
 
 void World::gen_flat_world() {
@@ -60,8 +60,8 @@ void World::snd_chunk_data( const sock::Client& client ) const {
 
     std::string gdata = gzip::compress(&apBlocks[0], apBlocks.size());
 
-    bool dRem = gdata.size() % CHUNK_LENGTH == 0;
-    int i = dRem ? dRem/CHUNK_LENGTH : (dRem - (dRem % CHUNK_LENGTH))/CHUNK_LENGTH;
+    int dRem = gdata.size() % CHUNK_LENGTH;
+    int i = dRem == 0 ? dRem/CHUNK_LENGTH : (dRem - (dRem % CHUNK_LENGTH))/CHUNK_LENGTH;
 
     for(int j = 0; j < i; j++) {
         std::string data = gdata.substr(j * CHUNK_LENGTH, CHUNK_LENGTH + (j * CHUNK_LENGTH));
@@ -69,7 +69,7 @@ void World::snd_chunk_data( const sock::Client& client ) const {
         packet::Packet chunk(0x03);
         chunk.write_short   (CHUNK_LENGTH);
         chunk.write_barray  (std::vector<char>(data.begin(), data.end()));
-        chunk.write_byte    (dRem && j == i ? 100 : 0);
+        chunk.write_byte    (dRem == 0 && j == i ? 100 : 0);
 
         client.send_pckt(chunk.get_data());
     }
