@@ -2,6 +2,7 @@
 
 #include <winsock2.h>
 #include <string>
+#include <vector>
 
 namespace chisel::sock {
 class Client {

@@ -1,5 +1,4 @@
 #include <iostream>
-#include <vector>
 
 #include "network/socket.h"
 #include "network/packet.h"

@@ -24,9 +24,9 @@ private:
 };
 
 struct Identify {
-    unsigned int protocolVer;
+    char protocolVer;
     std::string  username, key;
-    unsigned int unused;
+    char unused;
 };
 
 Identify identify_cl( const chisel::sock::Client& );
