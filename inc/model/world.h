@@ -20,7 +20,7 @@ public:
 
     static World create_new( uint16_t, uint16_t, uint16_t );
 
-    void join( const chisel::Player& ) const;
+    void spawn( const chisel::Player&, const sock::Client& ) const;
 private:
     uint16_t          _length, _height, _width;
     Location          _spawn;
@@ -28,6 +28,7 @@ private:
 
     void gen_flat_world();
 
+    void   snd_world_data  ( const sock::Client& ) const;
     void   snd_chunk_data  ( const sock::Client& ) const;
     size_t block_idx_fr_pos( const Location )      const;
     

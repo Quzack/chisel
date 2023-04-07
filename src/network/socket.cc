@@ -23,8 +23,12 @@ char Client::read_byte() const {
 
 std::string Client::read_str() const {
     char buffer[chisel::packet::STR_BF_SZ];
-    recv(_fd, buffer, chisel::packet::STR_BF_SZ, 0x8);
-    
+    int bytes_received = 0;
+
+    do {
+        bytes_received += recv(_fd, buffer + bytes_received, 1, 0x8);;
+    } while (bytes_received < chisel::packet::STR_BF_SZ && buffer[bytes_received - 1] != '\0');
+
     return std::string(buffer);
 }
 

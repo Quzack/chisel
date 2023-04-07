@@ -1,3 +1,6 @@
+#include <cstring>
+#include <iostream>
+
 #include "model/world.h"
 #include "model/block.h"
 #include "gzip/compress.h"
@@ -24,21 +27,19 @@ World World::create_new( uint16_t l, uint16_t h, uint16_t w ) {
     return world;
 } 
 
-void World::join( const chisel::Player& player ) const {
-    player.socket().send_pckt({0x02}); // LEVEL INIT.
-    snd_chunk_data(player.socket());   // CHUNK DATA.
+void World::spawn( const chisel::Player& player, const sock::Client& client ) const {
+    snd_world_data(player.socket());
 
-    packet::Packet finalize(0x04);
-    finalize.write_short(_length);
-    finalize.write_short(_height);
-    finalize.write_short(_width);
-
-    player.socket().send_pckt(finalize.get_data()); // LEVEL FINALIZE.
-    // TODO 5/4/2023: Spawn player.
     packet::Packet spawnPk(0x07);
     spawnPk.write_sbyte   (player.id());
     spawnPk.write_str     (player.name);
+    spawnPk.write_fshort  (_spawn.x);
+    spawnPk.write_fshort  (_spawn.y);
+    spawnPk.write_fshort  (_spawn.z);
+    spawnPk.write_byte    (90);
+    spawnPk.write_byte    (0);
 
+    client.send_pckt(spawnPk.get_data());
 }
 
 void World::gen_flat_world() {
@@ -53,18 +54,34 @@ void World::gen_flat_world() {
     }
 }
 
+void World::snd_world_data( const sock::Client& client ) const {
+    client.send_pckt({0x02}); // LEVEL INIT.
+    snd_chunk_data(client);   // CHUNK DATA.
+
+    packet::Packet finalize(0x04);
+    finalize.write_short(_length);
+    finalize.write_short(_height);
+    finalize.write_short(_width);
+
+    client.send_pckt(finalize.get_data()); // LEVEL FINALIZE.
+}
+
 void World::snd_chunk_data( const sock::Client& client ) const {
-    std::vector<char> apBlocks(_blocks.size() + 1);
-    apBlocks.push_back((uint32_t) _blocks.size());
-    apBlocks.insert(apBlocks.begin() + 1, _blocks.begin(), _blocks.end());
+    uint32_t blockLength = htonl(static_cast<uint32_t>(_blocks.size()));
 
-    std::string gdata = gzip::compress(&apBlocks[0], apBlocks.size());
+    std::vector<char> apBlocks(_blocks.size() + 4);
+    std::memcpy(apBlocks.data(), &blockLength, 4);
+    std::memcpy(apBlocks.data() + 4, _blocks.data(), _blocks.size());
 
-    int dRem = gdata.size() % CHUNK_LENGTH;
-    int i = dRem == 0 ? dRem/CHUNK_LENGTH : (dRem - (dRem % CHUNK_LENGTH))/CHUNK_LENGTH;
+    std::string gData = gzip::compress(&apBlocks[0], apBlocks.size());
+
+    int dRem = gData.size() % CHUNK_LENGTH;
+    int i = (dRem == 0) ? gData.size()/CHUNK_LENGTH : (gData.size() - dRem)/CHUNK_LENGTH;
+
+    short finalBlocks = _blocks.size();
 
     for(int j = 0; j < i; j++) {
-        std::string data = gdata.substr(j * CHUNK_LENGTH, CHUNK_LENGTH + (j * CHUNK_LENGTH));
+        std::string data = gData.substr(j * CHUNK_LENGTH, CHUNK_LENGTH + (j * CHUNK_LENGTH));
 
         packet::Packet chunk(0x03);
         chunk.write_short   (CHUNK_LENGTH);
@@ -72,13 +89,19 @@ void World::snd_chunk_data( const sock::Client& client ) const {
         chunk.write_byte    (dRem == 0 && j == i ? 100 : 0);
 
         client.send_pckt(chunk.get_data());
+        finalBlocks -= j * CHUNK_LENGTH;
     }
 
-    if(dRem) return;
+    if(dRem == 0) return;
+
     packet::Packet chunk(0x03);
-    chunk.write_short   (dRem);
-    chunk.write_barray  (std::vector<char>(gdata.begin() - dRem, gdata.end()));
-    chunk.write_byte    (100);
+    chunk.write_short   ((i == 0) ? gData.size() : finalBlocks);
+
+    std::vector<char> chunkData;
+    chunkData.insert(chunkData.begin(), (i == 0) ? gData.begin() : gData.end() - finalBlocks, gData.end());
+
+    chunk.write_barray(chunkData);
+    chunk.write_byte  (100);
 
     client.send_pckt(chunk.get_data());
 }

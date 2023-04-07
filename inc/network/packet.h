@@ -17,7 +17,8 @@ public:
     void write_sbyte ( const signed char );
     void write_str   ( const std::string );
     void write_short ( const signed short int );
-    void write_barray( const std::vector<char> );
+    void write_fshort( const signed short );
+    void write_barray( std::vector<char> );
 
     std::vector<char>& get_data() { return this->_buffer; }
 private:

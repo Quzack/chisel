@@ -65,7 +65,7 @@ void Server::tick_player( chisel::Player& player ) {
         return;
     }
 
-    unsigned int pId = player.socket().read_byte();
+    unsigned char pId = player.socket().read_byte();
 
     switch(pId) {
         case 0x00: {
@@ -82,7 +82,10 @@ void Server::tick_player( chisel::Player& player ) {
             player.name = data.username;
 
             _logger.log(LL_INFO, player.name + " is connecting...");
-            _world.join(player);
+        
+            for(auto& p : _players) {
+                _world.spawn(player, p.socket()); // Sends spawn packet to all players.
+            }
         }
         default: 
             std::cout << "Unknown packet: " << pId << std::endl;
@@ -93,9 +96,14 @@ void Server::tick_player( chisel::Player& player ) {
 void Server::send_serv_idt( const sock::Client& client, bool op ) const {
     packet::Packet idt(0x00);
     idt.write_byte    (packet::PROTOCOL_VERSION);
-    idt.write_str     (_config->name);
-    idt.write_str     (_config->motd);
+    idt.write_str     (_config->name.substr(0, 63));
+    idt.write_str     (_config->motd.substr(0, 63));
     idt.write_byte    (op ? 0x64 : 0x00);
+
+    int padding_size = 131 - idt.get_data().size();
+    for (int i = 0; i < padding_size; i++) {
+        idt.write_byte(0x00);
+    }
 
     client.send_pckt(idt.get_data());
 }
