@@ -18,7 +18,7 @@ Server::Server(
     _salt      (rand_b62_str(16)),
     _logger    ("LOG_" + std::to_string(time(NULL)) + ".txt"),
     _world     (world),
-    _threadPool(config->maxPlayers + 5),
+    _threadPool(std::thread::hardware_concurrency()),
     _config    (config),
     _operators (ops)
 {
@@ -41,7 +41,7 @@ void Server::start() {
     });
 
     while(true) {
-        int8_t pId;
+        int pId;
         do {  pId = rand_no(-127, 127); } while(player_id_exist(pId));
 
         _players.push_back(Player(_socket.accept_cl(), pId));
@@ -50,26 +50,31 @@ void Server::start() {
 
 void Server::tick() {
     for(auto& p : _players) {
-        if(p.active == false) {
-            // TODO 27/10/22: Removing player from vector.
-            continue;
+        if(!p.ping()) p.active = false;
+    }
+
+    int i = 0;
+    while (i < _players.size()) {
+        auto& player = _players[i];
+        if (!player.active) {
+            // TODO 9/4/23: Despawn player packet.
+            std::cout << "erased!!!" << std::endl;
+            _players.erase(_players.begin() + i);
+            return;
         }
 
-        tick_player(p);
+        tick_player(player);
+        i++;
     }
 }
 
 void Server::tick_player( chisel::Player& player ) {
-    if(!player.ping()) {
-        player.active = false;
-        return;
-    }
-
-    unsigned char pId = player.socket().read_byte();
+    char pId = player.socket().read_byte();
 
     switch(pId) {
         case 0x00: {
             auto data = packet::identify_cl(player.socket());
+            std::cout << data.username << std::endl;
 
             player.op = obj_in_vec(*_operators, data.username);
             send_serv_idt(player.socket(), player.op);
@@ -84,11 +89,11 @@ void Server::tick_player( chisel::Player& player ) {
             _logger.log(LL_INFO, player.name + " is connecting...");
         
             for(auto& p : _players) {
+                if(p.id() == player.id()) continue;
                 _world.spawn(player, p.socket()); // Sends spawn packet to all players.
             }
         }
         default: 
-            std::cout << "Unknown packet: " << pId << std::endl;
             break;
     }
 }

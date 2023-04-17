@@ -13,8 +13,20 @@ public:
     bool        op     = false;
     std::string name;
 
-    Player ( sock::Client, const int8_t );
+    Player ( sock::Client, int8_t );
     ~Player();
+
+    Player& operator=(const Player& player) {
+        if(this != &player) {
+            this->active  = player.active;
+            this->op      = player.op;
+            this->name    = player.name;
+            this->_id     = player._id;
+            this->_socket = player._socket;
+        }
+
+        return *this;
+    }
 
     void teleport( Location );
 
@@ -24,7 +36,7 @@ public:
     sock::Client socket()              const { return this->_socket; }
     int8_t id          ()              const { return this->_id; }
 private:
-    const sock::Client  _socket;
-    const int8_t        _id;
+    int8_t        _id;
+    sock::Client  _socket;
 };
 }

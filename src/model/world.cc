@@ -1,5 +1,4 @@
 #include <cstring>
-#include <iostream>
 
 #include "model/world.h"
 #include "model/block.h"

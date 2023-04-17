@@ -9,16 +9,14 @@ using chisel::sock::Client;
 Client::Client( int fd ):
     _fd(fd)
 {
+    u_long iMode = 1;
+    ioctlsocket(_fd, FIONBIO, &iMode);
 
-}
-
-int Client::send_pckt( const std::vector<char>& data ) const {
-    send(_fd, &data[0], data.size(), 0);
 }
 
 char Client::read_byte() const {
     char buffer;
-    return (recv(_fd, &buffer, 1, 0) == -1) ? -1 : buffer;
+    return (recv(_fd, &buffer, 1, 0) <= 0) ? -1 : buffer;
 }
 
 std::string Client::read_str() const {
@@ -26,10 +24,15 @@ std::string Client::read_str() const {
     int bytes_received = 0;
 
     do {
-        bytes_received += recv(_fd, buffer + bytes_received, 1, 0x8);;
+        bytes_received += recv(_fd, buffer + bytes_received, chisel::packet::STR_BF_SZ - bytes_received, 0);;
     } while (bytes_received < chisel::packet::STR_BF_SZ && buffer[bytes_received - 1] != '\0');
 
     return std::string(buffer);
+}
+
+bool Client::send_pckt( const std::vector<char>& data ) const {
+    size_t len = send(_fd, &data[0], data.size(), 0);
+    return (len >= 0 && len == data.size()) ? true : false;
 }
 
 Server::Server() {

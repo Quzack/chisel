@@ -31,6 +31,5 @@ private:
     void   snd_world_data  ( const sock::Client& ) const;
     void   snd_chunk_data  ( const sock::Client& ) const;
     size_t block_idx_fr_pos( const Location )      const;
-    
 };
 }

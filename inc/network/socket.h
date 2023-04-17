@@ -9,11 +9,11 @@ class Client {
 public:
     Client ( int );
 
-    char        read_byte()                           const;
-    std::string read_str ()                           const;
-    int send_pckt        ( const std::vector<char>& ) const;
+    char read_byte      ()                           const; // NON BLOCKING
+    std::string read_str()                           const;
+    bool send_pckt      ( const std::vector<char>& ) const;
 private:
-    const int _fd;
+    int _fd;
 };
 
 class Server {
