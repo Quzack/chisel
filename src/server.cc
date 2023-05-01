@@ -58,7 +58,6 @@ void Server::tick() {
         auto& player = _players[i];
         if (!player.active) {
             // TODO 9/4/23: Despawn player packet.
-            std::cout << "erased!!!" << std::endl;
             _players.erase(_players.begin() + i);
             return;
         }
@@ -74,7 +73,6 @@ void Server::tick_player( chisel::Player& player ) {
     switch(pId) {
         case 0x00: {
             auto data = packet::identify_cl(player.socket());
-            std::cout << data.username << std::endl;
 
             player.op = obj_in_vec(*_operators, data.username);
             send_serv_idt(player.socket(), player.op);
@@ -90,7 +88,8 @@ void Server::tick_player( chisel::Player& player ) {
         
             for(auto& p : _players) {
                 if(p.id() == player.id()) continue;
-                _world.spawn(player, p.socket()); // Sends spawn packet to all players.
+                _world.spawn(player, _world.get_spawn(), p.socket());
+                _world.spawn(p, p.loc(), player.socket());
             }
         }
         default: 

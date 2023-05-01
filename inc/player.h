@@ -28,15 +28,18 @@ public:
         return *this;
     }
 
-    void teleport( Location );
+    void set_pos( Location pos ) { this->_loc = pos; };
 
-    void disconnect    ( std::string ) const;
-    void send_msg      ( std::string ) const;
-    bool ping          ()              const;
-    sock::Client socket()              const { return this->_socket; }
-    int8_t id          ()              const { return this->_id; }
+    void disconnect          ( std::string ) const;
+    void send_msg            ( std::string ) const;
+    bool ping                ()              const;
+    const sock::Client socket()              const { return this->_socket; }
+    const int8_t id          ()              const { return this->_id; }
+    const Location loc       ()              const { return this->_loc; }
 private:
     int8_t        _id;
     sock::Client  _socket;
+    Location      _loc;
+
 };
 }

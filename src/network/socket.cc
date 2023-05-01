@@ -11,7 +11,6 @@ Client::Client( int fd ):
 {
     u_long iMode = 1;
     ioctlsocket(_fd, FIONBIO, &iMode);
-
 }
 
 char Client::read_byte() const {

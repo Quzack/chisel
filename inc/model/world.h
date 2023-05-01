@@ -20,7 +20,13 @@ public:
 
     static World create_new( uint16_t, uint16_t, uint16_t );
 
-    void spawn( const chisel::Player&, const sock::Client& ) const;
+    const Location get_spawn() { this->_spawn; }
+
+    void spawn( 
+        chisel::Player&, 
+        Location,
+        const sock::Client& 
+    ) const;
 private:
     uint16_t          _length, _height, _width;
     Location          _spawn;

@@ -13,10 +13,6 @@ Player::~Player() {
 
 }
 
-void Player::teleport( Location location ) {
-    
-}
-
 void Player::disconnect( std::string reason ) const {
     // TODO 27/9/22: Send 0x0e packet.
 }

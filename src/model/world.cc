@@ -20,23 +20,33 @@ World::World(
 }
 
 World World::create_new( uint16_t l, uint16_t h, uint16_t w ) {
-    World world(l, h, w, { l/2, h/2, w/2 }, std::vector<char>(l*w*h, AIR));
+    World world(
+        l, h, w, 
+        {l/2, h/2, w/2}, 
+        std::vector<char>(l*w*h, AIR)
+    );
     world.gen_flat_world();
 
     return world;
 } 
 
-void World::spawn( const chisel::Player& player, const sock::Client& client ) const {
+void World::spawn( 
+    chisel::Player& player, 
+    const Location loc, 
+    const sock::Client& client 
+) const {
     snd_world_data(player.socket());
 
     packet::Packet spawnPk(0x07);
     spawnPk.write_sbyte   (player.id());
     spawnPk.write_str     (player.name);
-    spawnPk.write_fshort  (_spawn.x);
-    spawnPk.write_fshort  (_spawn.y);
-    spawnPk.write_fshort  (_spawn.z);
-    spawnPk.write_byte    (90);
-    spawnPk.write_byte    (0);
+    spawnPk.write_fshort  (loc.x);
+    spawnPk.write_fshort  (loc.y);
+    spawnPk.write_fshort  (loc.z);
+    spawnPk.write_byte    (loc.yaw);
+    spawnPk.write_byte    (loc.pitch);
+
+    player.set_pos(_spawn);
 
     client.send_pckt(spawnPk.get_data());
 }
