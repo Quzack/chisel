@@ -87,8 +87,9 @@ void Server::tick_player( chisel::Player& player ) {
             _logger.log(LL_INFO, player.name + " is connecting...");
         
             for(auto& p : _players) {
-                if(p.id() == player.id()) continue;
                 _world.spawn(player, _world.get_spawn(), p.socket());
+                
+                if(p.id() == player.id()) continue;
                 _world.spawn(p, p.loc(), player.socket());
             }
         }
