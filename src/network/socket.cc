@@ -18,6 +18,13 @@ char Client::read_byte() const {
     return (recv(_fd, &buffer, 1, 0) <= 0) ? -1 : buffer;
 }
 
+short Client::read_short() const {
+    unsigned char b1 = read_byte();
+    unsigned char b2 = read_byte();
+
+    return ((b1 << 8) | b2);
+}
+
 std::string Client::read_str() const {
     char buffer[chisel::packet::STR_BF_SZ];
     int bytes_received = 0;

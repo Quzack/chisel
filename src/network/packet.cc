@@ -50,13 +50,4 @@ void Packet::write_barray( std::vector<char> data ) {
         write_byte(0x00);
     }
 } 
-
-Identify identify_cl( const chisel::sock::Client& socket ) {
-    return {
-        socket.read_byte(),
-        socket.read_str (),
-        socket.read_str (),
-        socket.read_byte()
-    };
-}
 }

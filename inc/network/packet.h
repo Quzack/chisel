@@ -4,6 +4,9 @@
 #include <vector>
 
 #include "socket.h"
+#include "player.h"
+#include "utils.h"
+#include "model/location.h"
 
 namespace chisel::packet {
 const unsigned int PROTOCOL_VERSION = 0x07;
@@ -25,11 +28,49 @@ private:
     std::vector<char> _buffer;
 };
 
+inline void send_spawn_pckt( 
+    const chisel::Player& p, 
+    const Location loc, 
+    const chisel::sock::Client& cl
+) {
+    packet::Packet spawnPk(0x07);
+    spawnPk.write_sbyte   (p.id());
+    spawnPk.write_str     (p.name);
+    spawnPk.write_fshort  (loc.x);
+    spawnPk.write_fshort  (loc.y);
+    spawnPk.write_fshort  (loc.z);
+    spawnPk.write_byte    (loc.yaw);
+    spawnPk.write_byte    (loc.pitch);    
+
+    cl.send_pckt(spawnPk.get_data());
+}
+
 struct Identify {
-    char protocolVer;
-    std::string  username, key;
-    char unused;
+    char        protocolVer;
+    std::string username, key;
+    char        unused;
 };
 
-Identify identify_cl( const chisel::sock::Client& );
+struct SetBlock {
+    Location coord;
+    char     mode; // Created or destroyed.
+    char     block;
+};
+
+inline Identify identify_cl( const chisel::sock::Client& sock ) {
+    return {
+        sock.read_byte(),
+        rem_empty     (sock.read_str()),
+        sock.read_str (),
+        sock.read_byte()
+    };
+}
+
+inline SetBlock id_set_blck( const chisel::sock::Client& sock ) {
+    return {
+        {sock.read_short(), sock.read_short(), sock.read_short()},
+        sock.read_byte  (),
+        sock.read_byte  ()
+    };
+}
 }

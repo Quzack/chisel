@@ -9,7 +9,8 @@ class Client {
 public:
     Client ( int );
 
-    char read_byte      ()                           const; // NON BLOCKING
+    char  read_byte     ()                           const; // NON BLOCKING
+    short read_short    ()                           const;
     std::string read_str()                           const;
     bool send_pckt      ( const std::vector<char>& ) const;
 private:

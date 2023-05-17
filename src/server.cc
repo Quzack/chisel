@@ -83,15 +83,21 @@ void Server::tick_player( chisel::Player& player ) {
             }
 
             player.name = data.username;
-
             _logger.log(LL_INFO, player.name + " is connecting...");
         
-            for(auto& p : _players) {
-                _world.spawn(player, _world.get_spawn(), p.socket());
-                
+            _world.spawn(player);
+
+            for(auto& p : _players) {           
                 if(p.id() == player.id()) continue;
-                _world.spawn(p, p.loc(), player.socket());
+
+                packet::send_spawn_pckt(player, player.loc(), p.socket());
+                packet::send_spawn_pckt(p, p.loc(), player.socket());
             }
+        }
+        case 0x05: {
+            auto data = packet::id_set_blck(player.socket());
+            
+            std::cout << "X: " << data.coord.x << " Y: " << data.coord.y << " Z: " << data.coord.z << std::endl; 
         }
         default: 
             break;

@@ -52,7 +52,7 @@ inline std::string current_date_time() {
     return buf;
 }
 
-inline std::string remove_empty( std::string str ) {
+inline std::string rem_empty( std::string str ) {
     str.erase(std::remove(str.begin(), str.end(), ' '), str.end());
     return str;
 }
