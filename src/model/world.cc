@@ -30,6 +30,12 @@ World World::create_new( uint16_t l, uint16_t h, uint16_t w ) {
     return world;
 } 
 
+bool World::set_block( const Location coord, const char block ) {
+    if(coord.x < 0 || coord.y < 0 || coord.z < 0) return false;
+    this->_blocks[block_idx_fr_pos({coord.x, coord.y, coord.z})] = block;
+    return true;
+}
+
 void World::spawn( chisel::Player& player ) const {
     snd_world_data(player.socket());
     packet::send_spawn_pckt(player, _spawn, player.socket());
@@ -41,9 +47,7 @@ void World::gen_flat_world() {
     for(int y = 0; y < _height/2; y++) {
         for(int x = 0; x < _length; x++) {
             for(int z = 0; z < _width; z++) {
-                auto id = block_idx_fr_pos({x, y, z});
-
-                _blocks[id] = (y < ((_height/2) -1)) ? DIRT : GRASS;
+                set_block({x, y, z}, (y < ((_height/2) -1)) ? DIRT : GRASS);
             }
         }
     }

@@ -20,6 +20,8 @@ public:
 
     static World create_new( uint16_t, uint16_t, uint16_t );
 
+    bool set_block( const Location coord, const char block );
+
     void spawn( chisel::Player& ) const;
 private:
     uint16_t          _length, _height, _width;
