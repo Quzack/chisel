@@ -31,7 +31,7 @@ Server::~Server() {
 
 void Server::start() {
     _socket.listen_port(_config->port);
-    _logger.log(LL_INFO, "Listening for clients...");
+    //_logger.log(LL_INFO, "Server hosted on port: " + _config->port);
 
     _threadPool.queue([this] { 
         while(true) {
@@ -83,10 +83,10 @@ void Server::tick_player( chisel::Player& player ) {
             }
 
             player.name = data.username;
-            _logger.log(LL_INFO, player.name + " is trying to connect.");
+            //_logger.log(LL_INFO, player.name + " is trying to connect.");
         
             _world.spawn(player);
-            _logger.log(LL_INFO, player.name + " has joined the server.");
+            //_logger.log(LL_INFO, player.name + " has joined the server.");
 
             for(auto& p : _players) {           
                 if(p.id() == player.id()) continue;
@@ -98,7 +98,7 @@ void Server::tick_player( chisel::Player& player ) {
         case 0x05: {
             auto data = packet::id_set_blck(player.socket());
             char block = (data.mode == 0x01) ? data.block : 0x00; 
-            
+
             if(!this->_world.set_block(data.coord, block)) return;
 
             packet::Packet pckSb(0x06);
@@ -110,6 +110,9 @@ void Server::tick_player( chisel::Player& player ) {
             for(auto& p : _players) {
                 p.socket().send_pckt(pckSb.get_data());
             }
+        }
+        case 0x08: {
+
         }
         default: 
             break;

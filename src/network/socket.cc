@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "network/socket.h"
 #include "network/packet.h"
 
@@ -64,7 +62,6 @@ void Server::listen_port( const int port ) {
     this->_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     bind(_fd, (LPSOCKADDR) &addr, sizeof(addr));
 
-    std::cout << "Listening to port: " << port << std::endl;
     listen(_fd, SOMAXCONN);
 }
 

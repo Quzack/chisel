@@ -67,7 +67,6 @@ void World::snd_world_data( const sock::Client& client ) const {
 
 void World::snd_chunk_data( const sock::Client& client ) const {
     uint32_t blockLength = htonl(static_cast<uint32_t>(_blocks.size()));
-
     std::vector<char> apBlocks(_blocks.size() + 4);
     std::memcpy(apBlocks.data(), &blockLength, 4);
     std::memcpy(apBlocks.data() + 4, _blocks.data(), _blocks.size());
@@ -76,8 +75,7 @@ void World::snd_chunk_data( const sock::Client& client ) const {
 
     int dRem = gData.size() % CHUNK_LENGTH;
     int i = (dRem == 0) ? gData.size()/CHUNK_LENGTH : (gData.size() - dRem)/CHUNK_LENGTH;
-
-    short finalBlocks = _blocks.size();
+    short finalBlocks = gData.size();
 
     for(int j = 0; j < i; j++) {
         std::string data = gData.substr(j * CHUNK_LENGTH, CHUNK_LENGTH + (j * CHUNK_LENGTH));
@@ -88,14 +86,12 @@ void World::snd_chunk_data( const sock::Client& client ) const {
         chunk.write_byte    (dRem == 0 && j == i ? 100 : 0);
 
         client.send_pckt(chunk.get_data());
-        finalBlocks -= j * CHUNK_LENGTH;
+        finalBlocks -= (j+1) * CHUNK_LENGTH;
     }
 
     if(dRem == 0) return;
-
     packet::Packet chunk(0x03);
     chunk.write_short   ((i == 0) ? gData.size() : finalBlocks);
-
     std::vector<char> chunkData;
     chunkData.insert(chunkData.begin(), (i == 0) ? gData.begin() : gData.end() - finalBlocks, gData.end());
 

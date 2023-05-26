@@ -21,6 +21,7 @@ public:
     ~Logger() { _file.close(); }
 
     void log( const int l, std::string&& m ) {
+        std::cout << "[" << current_date_time() << "]" << "(" << lv_prf(l) << "): " << m << std::endl;
         _file << "[" << current_date_time() << "] " << "(" << lv_prf(l) << "): " << m << std::endl;
     }
 private:
