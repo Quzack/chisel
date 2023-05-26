@@ -31,7 +31,7 @@ Server::~Server() {
 
 void Server::start() {
     _socket.listen_port(_config->port);
-    //_logger.log(LL_INFO, "Server hosted on port: " + _config->port);
+    _logger.log(LL_INFO, "Started server.", true);
 
     _threadPool.queue([this] { 
         while(true) {
@@ -77,16 +77,19 @@ void Server::tick_player( chisel::Player& player ) {
             player.op = obj_in_vec(*_operators, data.username);
             send_serv_idt(player.socket(), player.op);
 
+            if(_players.size() + 1 > _config->maxPlayers)  {
+                player.disconnect("Server is full.");
+            }
+            
             for(auto& player : _players) {
                 if(player.name != data.username) continue;
                 player.disconnect("Player already on the server."); 
             }
 
             player.name = data.username;
-            //_logger.log(LL_INFO, player.name + " is trying to connect.");
         
             _world.spawn(player);
-            //_logger.log(LL_INFO, player.name + " has joined the server.");
+            _logger.log(LL_INFO, player.name + " has joined the server.", true);
 
             for(auto& p : _players) {           
                 if(p.id() == player.id()) continue;
@@ -126,8 +129,8 @@ void Server::send_serv_idt( const sock::Client& client, bool op ) const {
     idt.write_str     (_config->motd.substr(0, 63));
     idt.write_byte    (op ? 0x64 : 0x00);
 
-    int padding_size = 131 - idt.get_data().size();
-    for (int i = 0; i < padding_size; i++) {
+    int padding = 131 - idt.get_data().size();
+    for (int i = 0; i < padding; i++) {
         idt.write_byte(0x00);
     }
 

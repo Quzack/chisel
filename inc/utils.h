@@ -40,14 +40,14 @@ inline std::string rand_b62_str( int len ) {
     return str;
 }
 
-inline std::string current_date_time() {
+inline std::string fmt_time( const char* fmt ) {
     time_t now = time(0);
 
     struct tm tData;
     char      buf[80];
     
     tData = *localtime(&now);
-    strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tData);
+    strftime(buf, sizeof(buf), fmt, &tData);
     
     return buf;
 }

@@ -20,9 +20,11 @@ public:
 
     ~Logger() { _file.close(); }
 
-    void log( const int l, std::string&& m ) {
-        std::cout << "[" << current_date_time() << "]" << "(" << lv_prf(l) << "): " << m << std::endl;
-        _file << "[" << current_date_time() << "] " << "(" << lv_prf(l) << "): " << m << std::endl;
+    void log( const int l, std::string&& m, bool console ) {
+        if(console) {
+            std::cout << "[" << fmt_time("%d.%X")  << ":" << lv_prf(l) << "]: " << m << std::endl;
+        }
+        _file << "[" << fmt_time("%Y-%m-%d.%X") << "] " << "(" << lv_prf(l) << "): " << m << std::endl;
     }
 private:
     std::ofstream _file;
