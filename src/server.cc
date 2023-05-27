@@ -1,6 +1,5 @@
 #include <random>
 #include <time.h>
-#include <iostream>
 
 #include "server.h"
 #include "utils.h"
@@ -31,7 +30,7 @@ Server::~Server() {
 
 void Server::start() {
     _socket.listen_port(_config->port);
-    _logger.log(LL_INFO, "Started server.", true);
+    _logger.log(LL_INFO, "Started the server.", true);
 
     _threadPool.queue([this] { 
         while(true) {
@@ -42,7 +41,7 @@ void Server::start() {
 
     while(true) {
         int pId;
-        do {  pId = rand_no(-127, 127); } while(player_id_exist(pId));
+        do {  pId = rand_no(0, 127); } while(player_id_exist(pId));
 
         _players.push_back(Player(_socket.accept_cl(), pId));
     }
@@ -78,12 +77,12 @@ void Server::tick_player( chisel::Player& player ) {
             send_serv_idt(player.socket(), player.op);
 
             if(_players.size() + 1 > _config->maxPlayers)  {
-                player.disconnect("Server is full.");
+                player.disconnect("Server is currently full.");
             }
             
             for(auto& player : _players) {
                 if(player.name != data.username) continue;
-                player.disconnect("Player already on the server."); 
+                player.disconnect(player.name + " is already on the server."); 
             }
 
             player.name = data.username;
@@ -97,6 +96,7 @@ void Server::tick_player( chisel::Player& player ) {
                 packet::send_spawn_pckt(player, player.loc(), p.socket());
                 packet::send_spawn_pckt(p, p.loc(), player.socket());
             }
+            break;
         }
         case 0x05: {
             auto data = packet::id_set_blck(player.socket());
@@ -105,17 +105,26 @@ void Server::tick_player( chisel::Player& player ) {
             if(!this->_world.set_block(data.coord, block)) return;
 
             packet::Packet pckSb(0x06);
-            pckSb.write_short   (data.coord.x);
-            pckSb.write_short   (data.coord.y);
-            pckSb.write_short   (data.coord.z);
+            pckSb.write_xyz     (data.coord.x, data.coord.y, data.coord.z);
             pckSb.write_byte    (block);
 
             for(auto& p : _players) {
                 p.socket().send_pckt(pckSb.get_data());
             }
+            break;
         }
         case 0x08: {
+            auto data = packet::id_set_pos(player.socket());
 
+            packet::Packet pSp(0x08);
+            pSp.write_sbyte   (player.id());
+            pSp.write_loc     (data.coord);
+
+            for(auto& p : _players) {
+                if(p.id() == data.id) continue;
+                p.socket().send_pckt(pSp.get_data());
+            }
+            break;
         }
         default: 
             break;

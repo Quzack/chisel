@@ -1,4 +1,7 @@
+#include <iostream>
+
 #include "player.h"
+#include "network/packet.h"
 
 using chisel::Player;
 

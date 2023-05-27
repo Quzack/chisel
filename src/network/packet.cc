@@ -9,6 +9,20 @@ Packet::Packet( const unsigned char id ) {
     write_byte(id);
 }
 
+void Packet::write_xyz( const short x, const short y, const short z ) {
+    write_short(x);
+    write_short(y);
+    write_short(z);
+}
+
+void Packet::write_loc( const Location loc ) {
+    write_fshort(loc.x);
+    write_fshort(loc.y);
+    write_fshort(loc.z);
+    write_byte  (loc.yaw);
+    write_byte  (loc.pitch);
+}
+
 void Packet::write_byte( const unsigned char byte ) {
     _buffer.push_back(byte);
 }
@@ -36,8 +50,7 @@ void Packet::write_short( const signed short int i ) {
 }
 
 void Packet::write_fshort( const signed short value ) {
-    signed short fvalue = htons(value);
-    fvalue *= 32;
+    signed short fvalue = htons(value * 32); 
     _buffer.insert(_buffer.end(), (char*)&fvalue, (char*)&fvalue + sizeof(signed short));
 }
 

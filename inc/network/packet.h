@@ -16,6 +16,9 @@ class Packet {
 public:
     Packet( const unsigned char );
 
+    void write_xyz   ( const short, const short, const short );
+    void write_loc   ( const Location ); // FSHORT
+
     void write_byte  ( const unsigned char );
     void write_sbyte ( const signed char );
     void write_str   ( const std::string );
@@ -34,13 +37,9 @@ inline void send_spawn_pckt(
     const chisel::sock::Client& cl
 ) {
     packet::Packet spawnPk(0x07);
-    spawnPk.write_sbyte   (p.id());
+    spawnPk.write_sbyte   ((p.socket() == cl) ? -1 : p.id());
     spawnPk.write_str     (p.name);
-    spawnPk.write_fshort  (loc.x);
-    spawnPk.write_fshort  (loc.y);
-    spawnPk.write_fshort  (loc.z);
-    spawnPk.write_byte    (loc.yaw);
-    spawnPk.write_byte    (loc.pitch);    
+    spawnPk.write_loc     (loc); 
 
     cl.send_pckt(spawnPk.get_data());
 }
@@ -57,6 +56,11 @@ struct SetBlock {
     char     block;
 };
 
+struct SetPos {     // 0x08
+    signed char id; // -1
+    Location coord;
+};
+
 inline Identify identify_cl( const chisel::sock::Client& sock ) {
     return {
         sock.read_byte(),
@@ -71,6 +75,13 @@ inline SetBlock id_set_blck( const chisel::sock::Client& sock ) {
         {sock.read_short(), sock.read_short(), sock.read_short()},
         sock.read_byte  (),
         sock.read_byte  ()
+    };
+}
+
+inline SetPos id_set_pos( const chisel::sock::Client& sock ) {
+    return {
+        sock.read_sbyte(),
+        { sock.read_fshort(), sock.read_fshort(), sock.read_fshort(), sock.read_byte(), sock.read_byte()}
     };
 }
 }

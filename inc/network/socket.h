@@ -9,10 +9,14 @@ class Client {
 public:
     Client ( int );
 
-    char  read_byte     ()                           const; // NON BLOCKING
-    short read_short    ()                           const;
-    std::string read_str()                           const;
-    bool send_pckt      ( const std::vector<char>& ) const;
+    bool operator==(const Client& client) { return this->_fd == client._fd; }
+
+    char  read_byte         ()                           const; // NON BLOCKING
+    signed char read_sbyte  ()                           const;
+    short read_short        ()                           const;
+    signed short read_fshort()                           const;
+    std::string read_str    ()                           const;
+    bool send_pckt          ( const std::vector<char>& ) const;
 private:
     int _fd;
 };

@@ -16,11 +16,19 @@ char Client::read_byte() const {
     return (recv(_fd, &buffer, 1, 0) <= 0) ? -1 : buffer;
 }
 
+signed char Client::read_sbyte() const {
+    return read_byte();
+}
+
 short Client::read_short() const {
     unsigned char b1 = read_byte();
     unsigned char b2 = read_byte();
 
     return ((b1 << 8) | b2);
+}
+
+signed short Client::read_fshort() const {
+    return read_short()/32;
 }
 
 std::string Client::read_str() const {

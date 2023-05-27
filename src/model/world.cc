@@ -22,7 +22,7 @@ World::World(
 World World::create_new( uint16_t l, uint16_t h, uint16_t w ) {
     World world(
         l, h, w, 
-        {l/2, h/2, w/2, 90, 0}, 
+        {l/2, (h/2) + 1, w/2, 90, 0}, 
         std::vector<char>(l*w*h, AIR)
     );
     world.gen_flat_world();
@@ -58,9 +58,7 @@ void World::snd_world_data( const sock::Client& client ) const {
     snd_chunk_data(client);   // CHUNK DATA.
 
     packet::Packet finalize(0x04);
-    finalize.write_short(_length);
-    finalize.write_short(_height);
-    finalize.write_short(_width);
+    finalize.write_xyz(_length, _height, _width);
 
     client.send_pckt(finalize.get_data()); // LEVEL FINALIZE.
 }

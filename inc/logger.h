@@ -2,6 +2,7 @@
 
 #include <string>
 #include <fstream>
+#include <iostream>
 #include <sys/stat.h>
 
 #include "utils.h"
