@@ -6,7 +6,7 @@
 #include "socket.h"
 #include "player.h"
 #include "utils.h"
-#include "model/location.h"
+#include "location.h"
 
 namespace chisel::packet {
 const unsigned int PROTOCOL_VERSION = 0x07;

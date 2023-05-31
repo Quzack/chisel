@@ -8,7 +8,7 @@
 #include "logger.h"
 #include "network/socket.h"
 #include "thread/thread_pool.h"
-#include "model/world.h"
+#include "world.h"
 #include "player.h"
 
 namespace chisel {

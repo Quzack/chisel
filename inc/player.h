@@ -3,7 +3,7 @@
 #include <string>
 
 #include "network/socket.h"
-#include "model/location.h"
+#include "location.h"
 
 namespace chisel {
 class Server;

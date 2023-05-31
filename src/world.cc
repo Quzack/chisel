@@ -1,7 +1,7 @@
 #include <cstring>
 
-#include "model/world.h"
-#include "model/block.h"
+#include "world.h"
+#include "block.h"
 #include "gzip/compress.h"
 #include "network/packet.h"
 
