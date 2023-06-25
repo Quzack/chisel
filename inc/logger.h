@@ -21,7 +21,7 @@ public:
 
     ~Logger() { _file.close(); }
 
-    void log( const int l, std::string&& m, bool console ) {
+    void log( const int l, std::string m, bool console = true ) {
         if(console) {
             std::cout << "[" << fmt_time("%d.%X")  << ":" << lv_prf(l) << "]: " << m << std::endl;
         }

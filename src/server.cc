@@ -30,7 +30,7 @@ Server::~Server() {
 
 void Server::start() {
     _socket.listen_port(_config->port);
-    _logger.log(LL_INFO, "Started the server.", true);
+    _logger.log(LL_INFO, "Started the server.");
 
     _threadPool.queue([this] { 
         while(true) {
@@ -44,6 +44,16 @@ void Server::start() {
         do {  pId = rand_no(0, 127); } while(player_id_exist(pId));
 
         _players.push_back(Player(_socket.accept_cl(), pId));
+    }
+}
+
+void Server::broadcast( const std::string msg, const int8_t id ) const {
+    packet::Packet packet(0x0d);
+    packet.write_sbyte   (id);
+    packet.write_str     (msg);
+
+    for(auto& p : _players) {
+        p.socket().send_pckt(packet.get_data());
     }
 }
 
@@ -88,7 +98,7 @@ void Server::tick_player( chisel::Player& player ) {
             player.name = data.username;
         
             _world.spawn(player);
-            _logger.log(LL_INFO, player.name + " has joined the server.", true);
+            _logger.log(LL_INFO, player.name + " has joined the server.");
 
             for(auto& p : _players) {           
                 if(p.id() == player.id()) continue;
@@ -108,9 +118,7 @@ void Server::tick_player( chisel::Player& player ) {
             pckSb.write_xyz     (data.coord.x, data.coord.y, data.coord.z);
             pckSb.write_byte    (block);
 
-            for(auto& p : _players) {
-                p.socket().send_pckt(pckSb.get_data());
-            }
+            for(auto& p : _players) { p.socket().send_pckt(pckSb.get_data()); }
             break;
         }
         case 0x08: {
@@ -124,6 +132,19 @@ void Server::tick_player( chisel::Player& player ) {
                 if(p.id() == data.id) continue;
                 p.socket().send_pckt(pSp.get_data());
             }
+            break;
+        }
+        case 0x0d: {
+            auto msg = packet::rd_msg_pck(player.socket());
+            std::string rmsg = "<" + player.name + "> " + msg.msg;
+
+            if(rmsg.size() > packet::STR_BF_SZ) {
+                player.send_msg("&4Message exceeds 64 characters.");
+                return;
+            }
+
+            broadcast  (rmsg, player.id());
+            _logger.log(LL_INFO, rmsg);
             break;
         }
         default: 

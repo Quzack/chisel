@@ -57,6 +57,14 @@ inline std::string rem_empty( std::string str ) {
     return str;
 }
 
+static inline std::string rtrim( std::string s ) {
+    s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
+        return !std::isspace(ch);
+    }).base(), s.end());
+
+    return s;
+}
+
 template<typename T>
 inline bool obj_in_vec( std::vector<T>& vec, T& obj ) {
     return std::find(vec.begin(), vec.end(), obj) != vec.end();

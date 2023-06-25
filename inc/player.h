@@ -13,7 +13,7 @@ public:
     bool        op     = false;
     std::string name;
 
-    Player ( sock::Client, int8_t );
+    Player (  sock::Client, int8_t );
     ~Player();
 
     Player& operator=(const Player& player) {

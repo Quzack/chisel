@@ -22,6 +22,8 @@ public:
     ~Server();
             
     void start();
+
+    void broadcast( const std::string msg, const int8_t = -1 ) const;
 private:
     std::vector<std::string>*   _operators;
     chisel::Config*             _config;

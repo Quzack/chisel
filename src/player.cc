@@ -21,7 +21,11 @@ void Player::disconnect( std::string reason ) const {
 }
 
 void Player::send_msg( std::string msg ) const {
-    // TODO 28/9/22: Send 0x0d packet.
+    packet::Packet msgp(0x0d);
+    msgp.write_sbyte   (-2);
+    msgp.write_str     (msg);
+
+    _socket.send_pckt(msgp.get_data());
 }
 
 bool Player::ping() const {

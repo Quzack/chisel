@@ -16,7 +16,7 @@ public:
     short read_short        ()                           const;
     signed short read_fshort()                           const;
     std::string read_str    ()                           const;
-    bool send_pckt          ( const std::vector<char>& ) const;
+    bool send_pckt          ( const std::vector<char>& )       const;
 private:
     int _fd;
 };

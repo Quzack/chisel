@@ -3,10 +3,10 @@
 #include <string>
 #include <vector>
 
-#include "socket.h"
-#include "player.h"
+#include "network/socket.h"
 #include "utils.h"
 #include "location.h"
+#include "player.h"
 
 namespace chisel::packet {
 const unsigned int PROTOCOL_VERSION = 0x07;
@@ -61,6 +61,11 @@ struct SetPos {     // 0x08
     Location coord;
 };
 
+struct Message {
+    signed char pid; // -1
+    std::string msg;
+};
+
 inline Identify identify_cl( const chisel::sock::Client& sock ) {
     return {
         sock.read_byte(),
@@ -82,6 +87,13 @@ inline SetPos id_set_pos( const chisel::sock::Client& sock ) {
     return {
         sock.read_sbyte(),
         { sock.read_fshort(), sock.read_fshort(), sock.read_fshort(), sock.read_byte(), sock.read_byte()}
+    };
+}
+
+inline Message rd_msg_pck( const chisel::sock::Client& sock ) {
+    return {
+        sock.read_sbyte(),
+        rtrim          (sock.read_str())
     };
 }
 }
