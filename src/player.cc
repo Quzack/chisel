@@ -16,8 +16,12 @@ Player::~Player() {
 
 }
 
-void Player::disconnect( std::string reason ) const {
-    // TODO 27/9/22: Send 0x0e packet.
+void Player::disconnect( const std::string reason ) {
+    packet::Packet discp(0x0e);
+    discp.write_str     (reason);
+
+    _socket.send_pckt(discp.get_data());
+    this->active = false;
 }
 
 void Player::send_msg( std::string msg ) const {

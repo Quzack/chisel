@@ -28,11 +28,11 @@ public:
         return *this;
     }
 
-    void set_pos( Location pos ) { this->_loc = pos; }
+    void set_pos   ( Location pos ) { this->_loc = pos; }
+    void disconnect( const std::string );
 
     sock::Client socket() const { return this->_socket; }
 
-    void disconnect          ( std::string ) const;
     void send_msg            ( std::string ) const;
     bool ping                ()              const;
     const int8_t id          ()              const { return this->_id; }

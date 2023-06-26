@@ -52,9 +52,7 @@ void Server::broadcast( const std::string msg, const int8_t id ) const {
     packet.write_sbyte   (id);
     packet.write_str     (msg);
 
-    for(auto& p : _players) {
-        p.socket().send_pckt(packet.get_data());
-    }
+    echo_pckt(packet.get_data());
 }
 
 void Server::tick() {
@@ -66,12 +64,14 @@ void Server::tick() {
     while (i < _players.size()) {
         auto& player = _players[i];
         if (!player.active) {
-            // TODO 9/4/23: Despawn player packet.
+            echo_pckt({0x0c, player.id()});
+            _logger.log(LL_INFO, player.name + " has left the server.");
+            broadcast("&e" + player.name + " has left the server.");
             _players.erase(_players.begin() + i);
             return;
         }
 
-        tick_player(player);
+        tick_player(_players[i]);
         i++;
     }
 }
@@ -118,7 +118,7 @@ void Server::tick_player( chisel::Player& player ) {
             pckSb.write_xyz     (data.coord.x, data.coord.y, data.coord.z);
             pckSb.write_byte    (block);
 
-            for(auto& p : _players) { p.socket().send_pckt(pckSb.get_data()); }
+            echo_pckt(pckSb.get_data());
             break;
         }
         case 0x08: {
@@ -128,10 +128,7 @@ void Server::tick_player( chisel::Player& player ) {
             pSp.write_sbyte   (player.id());
             pSp.write_loc     (data.coord);
 
-            for(auto& p : _players) {
-                if(p.id() == data.id) continue;
-                p.socket().send_pckt(pSp.get_data());
-            }
+            echo_pckt(pSp.get_data());
             break;
         }
         case 0x0d: {
@@ -165,6 +162,12 @@ void Server::send_serv_idt( const sock::Client& client, bool op ) const {
     }
 
     client.send_pckt(idt.get_data());
+}
+
+void Server::echo_pckt( const std::vector<char>& data ) const {
+    for(auto& p : _players) {
+        p.socket().send_pckt(data);
+    }
 }
 
 bool Server::player_id_exist( const int8_t id ) const {

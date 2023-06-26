@@ -23,7 +23,7 @@ public:
             
     void start();
 
-    void broadcast( const std::string msg, const int8_t = -1 ) const;
+    void broadcast( const std::string, const int8_t = -1 ) const;
 private:
     std::vector<std::string>*   _operators;
     chisel::Config*             _config;
@@ -38,6 +38,7 @@ private:
     void tick_player   ( chisel::Player& );
 
     void send_serv_idt  ( const sock::Client&, bool ) const;
+    void echo_pckt      ( const std::vector<char>& )  const;
     bool player_id_exist( const int8_t )              const;
 };
 }
