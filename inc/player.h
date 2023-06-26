@@ -30,6 +30,8 @@ public:
 
     void set_pos   ( Location pos ) { this->_loc = pos; }
     void disconnect( const std::string );
+    void make_op   () { this->switch_usr_type(0x64); op = true; }
+    void deop      () { this->switch_usr_type(0x00); op = false; }
 
     sock::Client socket() const { return this->_socket; }
 
@@ -42,5 +44,6 @@ private:
     sock::Client  _socket;
     Location      _loc;
 
+    void switch_usr_type( const char uid ) { _socket.send_pckt({0x0f, uid}); }
 };
 }

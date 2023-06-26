@@ -82,8 +82,8 @@ void Server::tick_player( chisel::Player& player ) {
     switch(pId) {
         case 0x00: {
             auto data = packet::identify_cl(player.socket());
-
-            player.op = obj_in_vec(*_operators, data.username);
+            
+            if(obj_in_vec(*_operators, data.username)) { player.make_op(); };
             send_serv_idt(player.socket(), player.op);
 
             if(_players.size() + 1 > _config->maxPlayers)  {
