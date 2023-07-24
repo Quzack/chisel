@@ -10,7 +10,7 @@
 #define LL_INFO 0
 #define LL_WARN 1
 
-namespace chisel::logger {
+namespace chisel {
 class Logger {
 public:
     Logger ( std::string fileName ) {

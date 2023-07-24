@@ -1,15 +1,13 @@
 #include <fstream>
-#include <iostream>
 
 #include "server.h"
 #include "utils.h"
 
 using chisel::Config;
+using chisel::World;
 
-#define OP_FILE "op-list.txt"
-
-void create_files() {
-    if(!file_exists("config.cfg")) {
+void create_server_files() {
+    if(!file_exists(CFG_DFNAME)) {
         Config::create_new();
     }
     
@@ -18,7 +16,7 @@ void create_files() {
     }
 }
 
-std::vector<std::string> read_ops() {
+std::vector<std::string> idt_server_ops() {
     std::string              line; 
     std::ifstream            opf(OP_FILE);
     std::vector<std::string> ops;
@@ -31,16 +29,22 @@ std::vector<std::string> read_ops() {
 }
 
 int main(int argc, char** argv) {
-    create_files();
+    create_server_files();
 
-    std::ifstream configFile("config.cfg");
-    Config config = Config::from_file(configFile);
-
-    auto ops = read_ops();
-
-    chisel::Server(
+    Config config = Config::from_file();
+    
+    chisel::Server server(
         &config, 
-        &ops, 
-        chisel::World::create_new(100, 100, 100)
-    ).start();
+        idt_server_ops(), 
+        file_exists(WRLD_DFNAME) ? World::from_file() : World::create_new()
+    );
+    server.start();
+
+    while(server.is_running()) {
+        std::string cname;
+        std::cin >> cname;
+
+        // TODO 22/7/23: Find server command and run.
+        if(cname == "stop") server.stop();
+    }
 }

@@ -68,14 +68,19 @@ void Server::listen_port( const int port ) {
     this->_addr = addr;
 
     this->_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    bind(_fd, (LPSOCKADDR) &addr, sizeof(addr));
 
+    u_long iMode = 1;
+    ioctlsocket(_fd, FIONBIO, &iMode);
+
+    bind(_fd, (LPSOCKADDR) &addr, sizeof(addr));
     listen(_fd, SOMAXCONN);
 }
 
-Client Server::accept_cl() const {
+std::optional<Client> Server::accept_cl() const {
     int size = sizeof(_addr);
     const int fd = accept(_fd, (LPSOCKADDR) &_addr, &size);
+
+    if(fd == INVALID_SOCKET) return {};
 
     return Client(fd);
 }

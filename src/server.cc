@@ -5,15 +5,16 @@
 #include "utils.h"
 #include "network/packet.h"
 
-#define TICK_INTERVAL 1000/20
+#define TICK_INTERVAL_MS 1000/20
 
 using chisel::Server;
 
 Server::Server( 
-    chisel::Config* config, 
-    std::vector<std::string>* ops,
+    chisel::Config* config,
+    std::vector<std::string> ops,
     World world
 ):
+    _running   (false),
     _salt      (rand_b62_str(16)),
     _logger    ("LOG_" + std::to_string(time(NULL)) + ".txt"),
     _world     (world),
@@ -24,30 +25,46 @@ Server::Server(
     _threadPool.start();
 }
 
-Server::~Server() {
-    _threadPool.stop();
-}
-
 void Server::start() {
     _socket.listen_port(_config->port);
     _logger.log(LL_INFO, "Started the server.");
 
+    this->_running = true;
+
     _threadPool.queue([this] { 
-        while(true) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(TICK_INTERVAL));
+        while(this->_running) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(TICK_INTERVAL_MS));
             this->tick();
         }
     });
+    
+    _threadPool.queue([this] {
+        while(_running) {
+            int pId;
+            do { pId = rand_no(0, 127); } while(player_id_exist(pId));
 
-    while(true) {
-        int pId;
-        do {  pId = rand_no(0, 127); } while(player_id_exist(pId));
-
-        _players.push_back(Player(_socket.accept_cl(), pId));
-    }
+            auto client = _socket.accept_cl(); // No thread safety: single use.
+            if(!client.has_value()) continue;
+            
+            _players.push_back(Player(client.value(), pId));
+        }
+    });
 }
 
-void Server::broadcast( const std::string msg, const int8_t id ) const {
+void Server::stop() {
+    for(auto& p : _players) {
+        // TODO 16/7/23: User type checking.
+        p.disconnect("Server has been stopped.");
+    }
+
+    _world.save_tf();
+    _logger.log(LL_INFO, "Completed saving world.");
+
+    this->_running = false;
+    _threadPool.stop();
+}
+
+void Server::broadcast( const std::string msg, const int8_t id ) {
     packet::Packet packet(0x0d);
     packet.write_sbyte   (id);
     packet.write_str     (msg);
@@ -57,16 +74,22 @@ void Server::broadcast( const std::string msg, const int8_t id ) const {
 
 void Server::tick() {
     for(auto& p : _players) {
-        if(!p.ping()) p.active = false;
+        if(p.ping()) continue;
+        p.active = false;
     }
 
     int i = 0;
     while (i < _players.size()) {
         auto& player = _players[i];
+
         if (!player.active) {
             echo_pckt({0x0c, player.id()});
-            _logger.log(LL_INFO, player.name + " has left the server.");
-            broadcast("&e" + player.name + " has left the server.");
+
+            if(!player.name.empty()) {
+                _logger.log(LL_INFO, player.name + " has left the server.");
+                broadcast("&e" + player.name + " has left the server.");
+            }
+            
             _players.erase(_players.begin() + i);
             return;
         }
@@ -76,6 +99,7 @@ void Server::tick() {
     }
 }
 
+// TODO 17/7/23: _world mutex?
 void Server::tick_player( chisel::Player& player ) {
     char pId = player.socket().read_byte();
 
@@ -83,17 +107,20 @@ void Server::tick_player( chisel::Player& player ) {
         case 0x00: {
             auto data = packet::identify_cl(player.socket());
             
-            if(obj_in_vec(*_operators, data.username)) { player.make_op(); };
-            send_serv_idt(player.socket(), player.op);
-
             if(_players.size() + 1 > _config->maxPlayers)  {
+                
                 player.disconnect("Server is currently full.");
+                return;
             }
             
-            for(auto& player : _players) {
-                if(player.name != data.username) continue;
-                player.disconnect(player.name + " is already on the server."); 
+            for(auto& p : _players) {
+                if(p.name != data.username) continue;
+                player.disconnect(player.name + " is already on the server.");
+                return;
             }
+
+            if(obj_in_vec(_operators, data.username)) { player.make_op(); };
+            send_serv_idt(player.socket(), player.op);
 
             player.name = data.username;
         
@@ -164,13 +191,13 @@ void Server::send_serv_idt( const sock::Client& client, bool op ) const {
     client.send_pckt(idt.get_data());
 }
 
-void Server::echo_pckt( const std::vector<char>& data ) const {
+void Server::echo_pckt( const std::vector<char>& data ) {
     for(auto& p : _players) {
         p.socket().send_pckt(data);
     }
 }
 
-bool Server::player_id_exist( const int8_t id ) const {
+bool Server::player_id_exist( const int8_t id ) {
     for(auto& player : _players) {
         if(player.id() == id) return true;
     }

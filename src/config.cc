@@ -5,17 +5,19 @@
 using chisel::Config;
 
 void Config::create_new() {
-    std::ofstream file("config.cfg");
+    std::ofstream file(CFG_DFNAME);
     
     file << "port: " << 25565           << std::endl;
     file << "max-players: 20"           << std::endl;
-    file << "name: GenericName"         << std::endl;
+    file << "name: mcc-server"          << std::endl;
     file << "motd: A Minecraft server." << std::endl; 
 
     file.close();
 }
 
-Config Config::from_file( std::ifstream& file ) {
+Config Config::from_file( std::string name ) {
+    std::ifstream file(name);
+
     Config      config;
     std::string line;
 
@@ -28,5 +30,6 @@ Config Config::from_file( std::ifstream& file ) {
         else if(line.find("motd")        != -1) sin >> config.motd;
     }
 
+    file.close();
     return config;
 }

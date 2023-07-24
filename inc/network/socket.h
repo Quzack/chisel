@@ -3,6 +3,7 @@
 #include <winsock2.h>
 #include <string>
 #include <vector>
+#include <optional>
 
 namespace chisel::sock {
 class Client {
@@ -11,12 +12,12 @@ public:
 
     bool operator==(const Client& client) { return this->_fd == client._fd; }
 
-    char  read_byte         ()                           const; // NON BLOCKING
-    signed char read_sbyte  ()                           const;
-    short read_short        ()                           const;
+    char         read_byte  ()                           const; // NON BLOCKING
+    signed char  read_sbyte ()                           const;
+    short        read_short ()                           const;
     signed short read_fshort()                           const;
-    std::string read_str    ()                           const;
-    bool send_pckt          ( const std::vector<char>& )       const;
+    std::string  read_str   ()                           const;
+    bool         send_pckt  ( const std::vector<char>& ) const;
 private:
     int _fd;
 };
@@ -28,7 +29,7 @@ public:
 
     void listen_port( const int );
  
-    Client accept_cl() const;
+    std::optional<Client> accept_cl() const;
 private:
     SOCKADDR_IN _addr;
     int         _fd;

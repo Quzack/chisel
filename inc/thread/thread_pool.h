@@ -5,6 +5,7 @@
 #include <functional>
 #include <condition_variable>
 #include <mutex>
+#include <atomic>
 #include <queue>
 
 namespace chisel::thread {
@@ -19,7 +20,7 @@ private:
     std::vector<std::thread>          _threads;
     std::queue<std::function<void()>> _jobs;
     std::mutex                        _qMutex;
-    bool                              _active = true;
+    std::atomic<bool>                 _active;
     std::condition_variable           _mutCondition;
 
     void search_job();

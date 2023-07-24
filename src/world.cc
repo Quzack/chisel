@@ -1,11 +1,15 @@
 #include <cstring>
+#include <fstream>
+#include <sstream>
 
 #include "world.h"
-#include "block.h"
 #include "gzip/compress.h"
+#include "gzip/decompress.h"
 #include "network/packet.h"
 
 using chisel::World;
+
+const uint16_t CHUNK_LENGTH = 1024;
 
 World::World( 
     uint16_t l, uint16_t h, uint16_t w, 
@@ -19,11 +23,30 @@ World::World(
 
 }
 
+World World::from_file( const std::ifstream file ) {
+    std::stringstream fdstream;
+    fdstream << file.rdbuf();
+
+    std::string wdata = gzip::decompress(&fdstream.str()[0], fdstream.str().size());
+    if(wdata.empty()) return World::create_new();
+
+    uint16_t l, h, w;
+    std::memcpy(&l, &wdata[0], 2);
+    std::memcpy(&h, &wdata[2], 2);
+    std::memcpy(&w, &wdata[4], 2);
+
+    return World(
+        l, h, w,
+        Location::create(l/2, (h/2)+1, w/2),
+        std::vector<char>(wdata.begin() + 6, wdata.end())
+    );
+}
+
 World World::create_new( uint16_t l, uint16_t h, uint16_t w ) {
     World world(
         l, h, w, 
-        {l/2, (h/2) + 1, w/2, 90, 0}, 
-        std::vector<char>(l*w*h, AIR)
+        Location::create(l/2, (h/2)+1, w/2), 
+        std::vector<char>(l*w*h, 0x00)
     );
     world.gen_flat_world();
 
@@ -43,11 +66,26 @@ void World::spawn( chisel::Player& player ) const {
     player.set_pos(_spawn);
 }
 
+void World::save_tf( const std::string fname ) const {
+    std::vector<char> data(_blocks.size() + 6); // 2*3 bytes -> length height breadth
+    std::memcpy(data.data()    , &_length, 2);
+    std::memcpy(data.data() + 2, &_height, 2);
+    std::memcpy(data.data() + 4, &_width , 2);
+    std::memcpy(data.data() + 6, _blocks.data(), _blocks.size());
+
+    std::string cdata = gzip::compress(&data[0], data.size());
+
+    std::ofstream file(fname);
+    file << cdata << std::endl;
+
+    file.close();
+}
+
 void World::gen_flat_world() {
     for(int y = 0; y < _height/2; y++) {
         for(int x = 0; x < _length; x++) {
             for(int z = 0; z < _width; z++) {
-                set_block({x, y, z}, (y < ((_height/2) -1)) ? DIRT : GRASS);
+                set_block({x, y, z}, (y < ((_height/2) -1)) ? 0x03 : 0x02);
             }
         }
     }
@@ -63,6 +101,7 @@ void World::snd_world_data( const sock::Client& client ) const {
     client.send_pckt(finalize.get_data()); // LEVEL FINALIZE.
 }
 
+// plus sized disgusting function.
 void World::snd_chunk_data( const sock::Client& client ) const {
     uint32_t blockLength = htonl(static_cast<uint32_t>(_blocks.size()));
     std::vector<char> apBlocks(_blocks.size() + 4);

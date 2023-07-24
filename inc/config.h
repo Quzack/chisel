@@ -3,12 +3,14 @@
 #include <string>
 #include <fstream>
 
-namespace chisel {
+#define CFG_DFNAME "config.cfg"
+
+namespace chisel {    
 struct Config {
     unsigned int port, maxPlayers;
     std::string name, motd;
     
     static void   create_new();
-    static Config from_file ( std::ifstream& );
+    static Config from_file ( std::string = CFG_DFNAME );
 };
 }

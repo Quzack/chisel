@@ -2,14 +2,15 @@
 
 #include <vector>
 #include <string>
+#include <fstream>
 
 #include "network/socket.h"
 #include "player.h"
 #include "location.h"
 
-namespace chisel {
-const uint16_t CHUNK_LENGTH = 1024;
+#define WRLD_DFNAME "world.mcw"
 
+namespace chisel {
 class World {
 public:
     World( 
@@ -18,11 +19,17 @@ public:
         std::vector<char>
     );
 
-    static World create_new( uint16_t, uint16_t, uint16_t );
+    static World from_file ( const std::ifstream = std::ifstream(WRLD_DFNAME) );
+    static World create_new( 
+        uint16_t = 100, 
+        uint16_t = 100, 
+        uint16_t = 100 
+    );
 
     bool set_block( const Location coord, const char block );
 
-    void spawn( chisel::Player& ) const;
+    void spawn  ( chisel::Player& )                 const;
+    void save_tf( const std::string = WRLD_DFNAME ) const; // to file.
 private:
     uint16_t          _length, _height, _width;
     Location          _spawn;

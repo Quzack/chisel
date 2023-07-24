@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <atomic>
+#include <shared_mutex>
 
 #include "config.h"
 #include "logger.h"
@@ -11,34 +13,39 @@
 #include "world.h"
 #include "player.h"
 
+#define OP_FILE "op-list.txt"
+
 namespace chisel {
 class Server {
 public:
-    Server(
+    Server( 
         chisel::Config*, 
-        std::vector<std::string>*,
-        World
+        std::vector<std::string>, 
+        World 
     );
-    ~Server();
             
-    void start();
+    void start      ();
+    void stop       ();
+    void broadcast  ( const std::string, const int8_t = -2 );
 
-    void broadcast( const std::string, const int8_t = -1 ) const;
+    bool is_running() const { return this->_running; }
 private:
-    std::vector<std::string>*   _operators;
+    std::atomic<bool>           _running;
+    std::vector<std::string>    _operators;
     chisel::Config*             _config;
     std::string                 _salt;
     sock::Server                _socket;
-    logger::Logger              _logger;
+    Logger                      _logger;
     thread::ThreadPool          _threadPool;
     std::vector<chisel::Player> _players;
+    //std::shared_mutex           _pMutex;
     World                       _world;
 
-    void tick          ();
-    void tick_player   ( chisel::Player& );
+    void tick           ();
+    void tick_player    ( chisel::Player& );
+    void echo_pckt      ( const std::vector<char>& );
+    bool player_id_exist( const int8_t );
 
     void send_serv_idt  ( const sock::Client&, bool ) const;
-    void echo_pckt      ( const std::vector<char>& )  const;
-    bool player_id_exist( const int8_t )              const;
 };
 }

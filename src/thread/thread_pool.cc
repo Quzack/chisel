@@ -2,11 +2,14 @@
 
 using chisel::thread::ThreadPool;
 
-ThreadPool::ThreadPool( const int threadCount ) {
+ThreadPool::ThreadPool( const int threadCount ):
+    _active(false)
+{
     _threads.resize(threadCount);
 }
 
 void ThreadPool::start() {
+    _active = true;
     for(uint32_t i = 0; i < _threads.size(); i++) {
         _threads.at(i) = std::thread(&ThreadPool::search_job, this);
     }
@@ -15,7 +18,7 @@ void ThreadPool::start() {
 void ThreadPool::stop() {
     {
         std::unique_lock<std::mutex> lock(_qMutex);
-        _active = true;
+        _active = false;
     }
 
     _mutCondition.notify_all();
