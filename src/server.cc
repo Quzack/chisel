@@ -40,18 +40,18 @@ void Server::start() {
     
     _threadPool.queue([this] {
         while(_running) {
-            int pId;
-            do { pId = rand_no(0, 127); } while(player_id_exist(pId));
-
             auto client = _socket.accept_cl(); // No thread safety: single use.
             if(!client.has_value()) continue;
             
-            _players.push_back(Player(client.value(), pId));
+            std::lock_guard<std::mutex> lock(_cqMutex);
+            _cQueue.push(client.value());
         }
     });
 }
 
 void Server::stop() {
+    this->_running = false;
+
     for(auto& p : _players) {
         // TODO 16/7/23: User type checking.
         p.disconnect("Server has been stopped.");
@@ -60,7 +60,6 @@ void Server::stop() {
     _world.save_tf();
     _logger.log(LL_INFO, "Completed saving world.");
 
-    this->_running = false;
     _threadPool.stop();
 }
 
@@ -73,6 +72,17 @@ void Server::broadcast( const std::string msg, const int8_t id ) {
 }
 
 void Server::tick() {
+    {
+        std::lock_guard<std::mutex> lock(_cqMutex);
+        while(!_cQueue.empty()) {
+            int8_t id;
+            do { id = rand_no(0, 127); } while(player_id_exist(id));
+
+            _players.push_back({_cQueue.front(), id});
+            _cQueue.pop();
+        }
+    }
+
     for(auto& p : _players) {
         if(p.ping()) continue;
         p.active = false;

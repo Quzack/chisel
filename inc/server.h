@@ -38,7 +38,8 @@ private:
     Logger                      _logger;
     thread::ThreadPool          _threadPool;
     std::vector<chisel::Player> _players;
-    //std::shared_mutex           _pMutex;
+    std::queue<sock::Client>    _cQueue;
+    std::mutex                  _cqMutex;
     World                       _world;
 
     void tick           ();

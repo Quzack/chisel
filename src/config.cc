@@ -15,9 +15,7 @@ void Config::create_new() {
     file.close();
 }
 
-Config Config::from_file( std::string name ) {
-    std::ifstream file(name);
-
+Config Config::from_file( std::ifstream file ) {
     Config      config;
     std::string line;
 

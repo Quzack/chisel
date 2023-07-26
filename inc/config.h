@@ -11,6 +11,6 @@ struct Config {
     std::string name, motd;
     
     static void   create_new();
-    static Config from_file ( std::string = CFG_DFNAME );
+    static Config from_file ( std::ifstream = std::ifstream(CFG_DFNAME) );
 };
 }
