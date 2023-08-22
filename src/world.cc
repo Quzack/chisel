@@ -85,7 +85,7 @@ void World::gen_flat_world() {
     for(int y = 0; y < _height/2; y++) {
         for(int x = 0; x < _length; x++) {
             for(int z = 0; z < _width; z++) {
-                set_block({x, y, z}, (y < ((_height/2) -1)) ? 0x03 : 0x02);
+                set_block(Location::create(x, y, z), (y < ((_height/2) -1)) ? 0x03 : 0x02);
             }
         }
     }

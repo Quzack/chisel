@@ -15,7 +15,7 @@ public:
     char         read_byte  ()                           const; // NON BLOCKING
     signed char  read_sbyte ()                           const;
     short        read_short ()                           const;
-    signed short read_fshort()                           const;
+    float        read_fshort()                           const;
     std::string  read_str   ()                           const;
     bool         send_pckt  ( const std::vector<char>& ) const;
 private:

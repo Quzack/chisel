@@ -15,7 +15,6 @@ Server::Server(
     World world
 ):
     _running   (false),
-    _salt      (rand_b62_str(16)),
     _logger    ("LOG_" + std::to_string(time(NULL)) + ".txt"),
     _world     (world),
     _threadPool(std::thread::hardware_concurrency()),
@@ -63,7 +62,7 @@ void Server::stop() {
     _threadPool.stop();
 }
 
-void Server::broadcast( const std::string msg, const int8_t id ) {
+void Server::broadcast( const std::string msg, const int8_t id ) const {
     packet::Packet packet(0x0d);
     packet.write_sbyte   (id);
     packet.write_str     (msg);
@@ -116,9 +115,8 @@ void Server::tick_player( chisel::Player& player ) {
     switch(pId) {
         case 0x00: {
             auto data = packet::identify_cl(player.socket());
-            
+
             if(_players.size() + 1 > _config->maxPlayers)  {
-                
                 player.disconnect("Server is currently full.");
                 return;
             }
@@ -129,10 +127,10 @@ void Server::tick_player( chisel::Player& player ) {
                 return;
             }
 
+            player.name = data.username;
+            
             if(obj_in_vec(_operators, data.username)) { player.make_op(); };
             send_serv_idt(player.socket(), player.op);
-
-            player.name = data.username;
         
             _world.spawn(player);
             _logger.log(LL_INFO, player.name + " has joined the server.");
@@ -201,13 +199,13 @@ void Server::send_serv_idt( const sock::Client& client, bool op ) const {
     client.send_pckt(idt.get_data());
 }
 
-void Server::echo_pckt( const std::vector<char>& data ) {
+void Server::echo_pckt( const std::vector<char>& data ) const {
     for(auto& p : _players) {
         p.socket().send_pckt(data);
     }
 }
 
-bool Server::player_id_exist( const int8_t id ) {
+bool Server::player_id_exist( const int8_t id ) const {
     for(auto& player : _players) {
         if(player.id() == id) return true;
     }

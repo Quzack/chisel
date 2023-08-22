@@ -24,16 +24,15 @@ public:
         World 
     );
             
-    void start      ();
-    void stop       ();
-    void broadcast  ( const std::string, const int8_t = -2 );
+    void start    ();
+    void stop     ();
 
-    bool is_running() const { return this->_running; }
+    void broadcast( const std::string, const int8_t = -2 ) const;
+    bool is_running()                                      const { return this->_running; }
 private:
     std::atomic<bool>           _running;
     std::vector<std::string>    _operators;
     chisel::Config*             _config;
-    std::string                 _salt;
     sock::Server                _socket;
     Logger                      _logger;
     thread::ThreadPool          _threadPool;
@@ -44,9 +43,9 @@ private:
 
     void tick           ();
     void tick_player    ( chisel::Player& );
-    void echo_pckt      ( const std::vector<char>& );
-    bool player_id_exist( const int8_t );
 
+    void echo_pckt      ( const std::vector<char>& )  const;
+    bool player_id_exist( const int8_t )              const;
     void send_serv_idt  ( const sock::Client&, bool ) const;
 };
 }

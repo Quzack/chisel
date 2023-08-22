@@ -24,22 +24,6 @@ inline int rand_no( const int x, const int y ) {
     return distr(eng);
 }
 
-inline std::string rand_b62_str( int len ) {
-    auto& chrs = "0123456789"
-        "abcdefghijklmnopqrstuvwxyz"
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-    std::mt19937 rg{std::random_device{}()};
-    std::uniform_int_distribution<std::string::size_type> pick(0, sizeof(chrs) - 2);
-
-    std::string str;
-    str.reserve(len);
-
-    while(len--) str += chrs[pick(rg)];
-
-    return str;
-}
-
 inline std::string fmt_time( const char* fmt ) {
     time_t now = time(0);
 

@@ -27,8 +27,8 @@ short Client::read_short() const {
     return ((b1 << 8) | b2);
 }
 
-signed short Client::read_fshort() const {
-    return read_short()/32;
+float Client::read_fshort() const {
+    return read_short() / 32.0;
 }
 
 std::string Client::read_str() const {

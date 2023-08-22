@@ -14,16 +14,15 @@ const unsigned int STR_BF_SZ        = 64;
 
 class Packet {
 public:
-    Packet( const unsigned char );
+    Packet( unsigned char );
 
-    void write_xyz   ( const short, const short, const short );
+    void write_xyz   ( short, short, short );
     void write_loc   ( const Location ); // FSHORT
-
-    void write_byte  ( const unsigned char );
-    void write_sbyte ( const signed char );
+    void write_byte  ( unsigned char );
+    void write_sbyte ( signed char );
     void write_str   ( const std::string );
-    void write_short ( const signed short int );
-    void write_fshort( const signed short );
+    void write_short ( signed short int );
+    void write_fshort( float );
     void write_barray( std::vector<char> );
 
     std::vector<char>& get_data() { return this->_buffer; }
@@ -39,7 +38,7 @@ inline void send_spawn_pckt(
     packet::Packet spawnPk(0x07);
     spawnPk.write_sbyte   ((p.socket() == cl) ? -1 : p.id());
     spawnPk.write_str     (p.name);
-    spawnPk.write_loc     (loc); 
+    spawnPk.write_loc     (loc);
 
     cl.send_pckt(spawnPk.get_data());
 }
@@ -58,7 +57,7 @@ struct SetBlock {
 
 struct SetPos {     // 0x08
     signed char id; // -1
-    Location coord;
+    const Location coord;
 };
 
 struct Message {
@@ -77,7 +76,7 @@ inline Identify identify_cl( const chisel::sock::Client& sock ) {
 
 inline SetBlock id_set_blck( const chisel::sock::Client& sock ) {
     return {
-        {sock.read_short(), sock.read_short(), sock.read_short()},
+        Location::create(sock.read_short(), sock.read_short(), sock.read_short()),
         sock.read_byte  (),
         sock.read_byte  ()
     };
@@ -85,8 +84,9 @@ inline SetBlock id_set_blck( const chisel::sock::Client& sock ) {
 
 inline SetPos id_set_pos( const chisel::sock::Client& sock ) {
     return {
-        sock.read_sbyte(),
-        { sock.read_fshort(), sock.read_fshort(), sock.read_fshort(), sock.read_byte(), sock.read_byte()}
+        sock.read_sbyte (),
+        Location::create(sock.read_fshort(), sock.read_fshort(), sock.read_fshort(), 
+                        sock.read_byte(), sock.read_byte())
     };
 }
 

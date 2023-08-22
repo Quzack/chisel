@@ -1,15 +1,14 @@
 #include <winsock2.h>
-#include <iostream>
 
 #include "utils.h"
 #include "network/packet.h"
 
 namespace chisel::packet {
-Packet::Packet( const unsigned char id ) {
+Packet::Packet( unsigned char id ) {
     write_byte(id);
 }
 
-void Packet::write_xyz( const short x, const short y, const short z ) {
+void Packet::write_xyz( short x, short y, short z ) {
     write_short(x);
     write_short(y);
     write_short(z);
@@ -23,11 +22,11 @@ void Packet::write_loc( const Location loc ) {
     write_byte  (loc.pitch);
 }
 
-void Packet::write_byte( const unsigned char byte ) {
+void Packet::write_byte( unsigned char byte ) {
     _buffer.push_back(byte);
 }
 
-void Packet::write_sbyte( const signed char byte ) {
+void Packet::write_sbyte( signed char byte ) {
     _buffer.push_back(static_cast<char>(byte));
 }
 
@@ -44,14 +43,13 @@ void Packet::write_str( const std::string str ) {
     }
 }
 
-void Packet::write_short( const signed short int i ) {
+void Packet::write_short( signed short int i ) {
     signed short int value = htons(i);
     _buffer.insert(_buffer.end(), (char*)&value, (char*)&value + sizeof(signed short int));
 }
 
-void Packet::write_fshort( const signed short value ) {
-    signed short fvalue = htons(value * 32); 
-    _buffer.insert(_buffer.end(), (char*)&fvalue, (char*)&fvalue + sizeof(signed short));
+void Packet::write_fshort( float value ) {
+    write_short(value * 32.0);
 }
 
 void Packet::write_barray( std::vector<char> data ) {

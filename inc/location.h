@@ -2,10 +2,11 @@
 
 namespace chisel {
 struct Location {
-    int x, y, z, yaw, pitch;
+    float x, y, z;
+    int yaw, pitch;
 
-    static Location create( int x, int y, int z ) {
-        return {x, y, z, 90, 0};
+    static Location create( float x, float y, float z, int yaw = 90, int pitch = 0 ) {
+        return {x, y, z, yaw, pitch};
     }  
 };
 }
