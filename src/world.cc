@@ -55,7 +55,7 @@ World World::create_new( uint16_t l, uint16_t h, uint16_t w ) {
 
 bool World::set_block( const Location coord, const char block ) {
     if(coord.x < 0 || coord.y < 0 || coord.z < 0) return false;
-    this->_blocks[block_idx_fr_pos({coord.x, coord.y, coord.z})] = block;
+    this->_blocks[block_idx_fr_pos(coord)] = block;
     return true;
 }
 
