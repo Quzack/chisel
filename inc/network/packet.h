@@ -76,7 +76,7 @@ inline Identify identify_cl( const chisel::sock::Client& sock ) {
 
 inline SetBlock id_set_blck( const chisel::sock::Client& sock ) {
     return {
-        Location::create(sock.read_short(), sock.read_short(), sock.read_short()),
+        {sock.read_short(), sock.read_short(), sock.read_short()},
         sock.read_byte  (),
         sock.read_byte  ()
     };
@@ -84,9 +84,8 @@ inline SetBlock id_set_blck( const chisel::sock::Client& sock ) {
 
 inline SetPos id_set_pos( const chisel::sock::Client& sock ) {
     return {
-        sock.read_sbyte (),
-        Location::create(sock.read_fshort(), sock.read_fshort(), sock.read_fshort(), 
-                        sock.read_byte(), sock.read_byte())
+        sock.read_sbyte(),
+        { sock.read_fshort(), sock.read_fshort(), sock.read_fshort(), sock.read_byte(), sock.read_byte() }
     };
 }
 

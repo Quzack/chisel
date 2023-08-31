@@ -73,10 +73,8 @@ void World::save_tf( const std::string fname ) const {
     std::memcpy(data.data() + 4, &_width , 2);
     std::memcpy(data.data() + 6, _blocks.data(), _blocks.size());
 
-    std::string cdata = gzip::compress(&data[0], data.size());
-
     std::ofstream file(fname);
-    file << cdata << std::endl;
+    file << gzip::compress(&data[0], data.size()) << std::endl;
 
     file.close();
 }
@@ -101,9 +99,10 @@ void World::snd_world_data( const sock::Client& client ) const {
     client.send_pckt(finalize.get_data()); // LEVEL FINALIZE.
 }
 
-// plus sized disgusting function.
+// fat function.
 void World::snd_chunk_data( const sock::Client& client ) const {
     uint32_t blockLength = htonl(static_cast<uint32_t>(_blocks.size()));
+
     std::vector<char> apBlocks(_blocks.size() + 4);
     std::memcpy(apBlocks.data(), &blockLength, 4);
     std::memcpy(apBlocks.data() + 4, _blocks.data(), _blocks.size());

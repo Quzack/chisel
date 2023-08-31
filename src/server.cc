@@ -5,8 +5,6 @@
 #include "utils.h"
 #include "network/packet.h"
 
-#define TICK_INTERVAL_MS 1000/20
-
 using chisel::Server;
 
 Server::Server( 
@@ -32,7 +30,7 @@ void Server::start() {
 
     _threadPool.queue([this] { 
         while(this->_running) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(TICK_INTERVAL_MS));
+            //std::this_thread::sleep_for(std::chrono::milliseconds(TICK_INTERVAL_MS));
             this->tick();
         }
     });
@@ -158,25 +156,25 @@ void Server::tick_player( chisel::Player& player ) {
         }
         case 0x08: {
             auto data = packet::id_set_pos(player.socket());
-
-            packet::Packet pSp(0x08);
-            pSp.write_sbyte   (player.id());
-            pSp.write_loc     (data.coord);
+            
+            packet::Packet  pSp(0x08);
+            pSp.write_sbyte    (player.id());
+            pSp.write_loc      (data.coord);
 
             echo_pckt(pSp.get_data());
             break;
         }
         case 0x0d: {
-            auto msg = packet::rd_msg_pck(player.socket());
-            std::string rmsg = "<" + player.name + "> " + msg.msg;
+            auto msgp = packet::rd_msg_pck(player.socket());
+            std::string msg = "<" + player.name + "> " + msgp.msg;
 
-            if(rmsg.size() > packet::STR_BF_SZ) {
+            if(msg.size() > packet::STR_BF_SZ) {
                 player.send_msg("&4Message exceeds 64 characters.");
                 return;
             }
 
-            broadcast  (rmsg, player.id());
-            _logger.log(LL_INFO, rmsg);
+            broadcast  (msg, player.id());
+            _logger.log(LL_INFO, msg);
             break;
         }
         default: 
