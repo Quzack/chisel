@@ -4,7 +4,7 @@
 #include <string>
 #include <fstream>
 
-#include "network/socket.h"
+#include "socket.h"
 #include "player.h"
 #include "location.h"
 

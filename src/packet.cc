@@ -1,7 +1,7 @@
 #include <winsock2.h>
 
 #include "utils.h"
-#include "network/packet.h"
+#include "packet.h"
 
 namespace chisel::packet {
 Packet::Packet( unsigned char id ) {

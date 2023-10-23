@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "player.h"
-#include "network/packet.h"
+#include "packet.h"
 
 using chisel::Player;
 
@@ -12,11 +12,15 @@ Player::Player( sock::Client socket, const int8_t id ):
 
 }
 
+Player::~Player() {
+    
+}
+
 Player& Player::operator=( const Player& player ) {
     if(this != &player) {
         this->active  = player.active;
-        this->op      = player.op;
         this->name    = player.name;
+        this->_op     = player._op;
         this->_id     = player._id;
         this->_socket = player._socket;
     }

@@ -5,7 +5,7 @@
 #include "world.h"
 #include "gzip/compress.h"
 #include "gzip/decompress.h"
-#include "network/packet.h"
+#include "packet.h"
 
 using chisel::World;
 
@@ -75,7 +75,6 @@ void World::save_tf( const std::string fname ) const {
 
     std::ofstream file(fname);
     file << gzip::compress(&data[0], data.size()) << std::endl;
-
     file.close();
 }
 

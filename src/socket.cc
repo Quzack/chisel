@@ -1,5 +1,5 @@
-#include "network/socket.h"
-#include "network/packet.h"
+#include "socket.h"
+#include "packet.h"
 
 using chisel::sock::Server;
 using chisel::sock::Client;

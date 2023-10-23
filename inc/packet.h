@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include "network/socket.h"
+#include "socket.h"
 #include "utils.h"
 #include "location.h"
 #include "player.h"
@@ -43,6 +43,14 @@ inline void send_spawn_pckt(
     cl.send_pckt(spawnPk.get_data());
 }
 
+inline Packet pos_packet( int8_t id, Location coord ) {
+    packet::Packet  pSp(0x08);
+    pSp.write_sbyte    (id);
+    pSp.write_loc      (coord);
+
+    return pSp;
+}
+
 struct Identify {
     char        protocolVer;
     std::string username, key;
@@ -76,7 +84,7 @@ inline Identify identify_cl( const chisel::sock::Client& sock ) {
 
 inline SetBlock id_set_blck( const chisel::sock::Client& sock ) {
     return {
-        {sock.read_short(), sock.read_short(), sock.read_short()},
+        {(float)sock.read_short(), (float)sock.read_short(), (float)sock.read_short()},
         sock.read_byte  (),
         sock.read_byte  ()
     };

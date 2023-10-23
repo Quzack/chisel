@@ -3,7 +3,7 @@
 
 #include "server.h"
 #include "utils.h"
-#include "network/packet.h"
+#include "packet.h"
 
 using chisel::Server;
 
@@ -22,17 +22,19 @@ Server::Server(
     _threadPool.start();
 }
 
+Server::~Server() {
+
+}
+
 void Server::start() {
     _socket.listen_port(_config->port);
+    load_plugins();
     _logger.log(LL_INFO, "Started the server.");
 
     this->_running = true;
 
     _threadPool.queue([this] { 
-        while(this->_running) {
-            //std::this_thread::sleep_for(std::chrono::milliseconds(TICK_INTERVAL_MS));
-            this->tick();
-        }
+        while(this->_running) this->tick();
     });
     
     _threadPool.queue([this] {
@@ -47,8 +49,6 @@ void Server::start() {
 }
 
 void Server::stop() {
-    this->_running = false;
-
     for(auto& p : _players) {
         // TODO 16/7/23: User type checking.
         p.disconnect("Server has been stopped.");
@@ -57,7 +57,19 @@ void Server::stop() {
     _world.save_tf();
     _logger.log(LL_INFO, "Completed saving world.");
 
+    this->_running = false;
     _threadPool.stop();
+}
+
+bool Server::set_block( const Location coord, const char block) {
+    if(!_world.set_block(coord, block)) return false;
+
+    packet::Packet pckSb(0x06);
+    pckSb.write_xyz     (coord.x, coord.y, coord.z);
+    pckSb.write_byte    (block);
+
+    echo_pckt(pckSb.get_data());
+    return true;
 }
 
 void Server::broadcast( const std::string msg, const int8_t id ) const {
@@ -68,12 +80,20 @@ void Server::broadcast( const std::string msg, const int8_t id ) const {
     echo_pckt(packet.get_data());
 }
 
+std::optional<chisel::Player> Server::get_player( const int8_t id ) const {
+    for(auto& player : _players) {
+        if(player.id() == id) return player;
+    }
+
+    return {};
+}
+
 void Server::tick() {
     {
         std::lock_guard<std::mutex> lock(_cqMutex);
         while(!_cQueue.empty()) {
             int8_t id;
-            do { id = rand_no(0, 127); } while(player_id_exist(id));
+            do { id = rand_no(0, 127); } while(get_player(id).has_value());
 
             _players.push_back({_cQueue.front(), id});
             _cQueue.pop();
@@ -81,8 +101,7 @@ void Server::tick() {
     }
 
     for(auto& p : _players) {
-        if(p.ping()) continue;
-        p.active = false;
+        if(!p.ping()) p.active = false;
     }
 
     int i = 0;
@@ -101,16 +120,14 @@ void Server::tick() {
             return;
         }
 
-        tick_player(_players[i]);
+        tick_player(player);
         i++;
     }
 }
 
 // TODO 17/7/23: _world mutex?
 void Server::tick_player( chisel::Player& player ) {
-    char pId = player.socket().read_byte();
-
-    switch(pId) {
+    switch((char) player.socket().read_byte()) {
         case 0x00: {
             auto data = packet::identify_cl(player.socket());
 
@@ -128,7 +145,7 @@ void Server::tick_player( chisel::Player& player ) {
             player.name = data.username;
             
             if(obj_in_vec(_operators, data.username)) { player.make_op(); };
-            send_serv_idt(player.socket(), player.op);
+            send_serv_idt(player.socket(), player.opped());
         
             _world.spawn(player);
             _logger.log(LL_INFO, player.name + " has joined the server.");
@@ -145,23 +162,13 @@ void Server::tick_player( chisel::Player& player ) {
             auto data = packet::id_set_blck(player.socket());
             char block = (data.mode == 0x01) ? data.block : 0x00; 
 
-            if(!this->_world.set_block(data.coord, block)) return;
-
-            packet::Packet pckSb(0x06);
-            pckSb.write_xyz     (data.coord.x, data.coord.y, data.coord.z);
-            pckSb.write_byte    (block);
-
-            echo_pckt(pckSb.get_data());
+            set_block(data.coord, block);
             break;
         }
         case 0x08: {
             auto data = packet::id_set_pos(player.socket());
-            
-            packet::Packet  pSp(0x08);
-            pSp.write_sbyte    (player.id());
-            pSp.write_loc      (data.coord);
 
-            echo_pckt(pSp.get_data());
+            echo_pckt(packet::pos_packet(player.id(), data.coord).get_data());
             break;
         }
         case 0x0d: {
@@ -180,6 +187,36 @@ void Server::tick_player( chisel::Player& player ) {
         default: 
             break;
     }
+}
+
+void Server::load_plugins() {
+    _logger.log(LL_INFO, "Loading plugins.");    
+    
+    WIN32_FIND_DATAW fd;
+    HANDLE fh = FindFirstFileW(L".\\plugins\\*.dll", &fd);
+
+    if (fh == INVALID_HANDLE_VALUE) {
+        _logger.log(LL_INFO, "No plugins found.");
+        mkdir("plugins");
+        return;
+    }
+
+    do {
+        std::wstring path = std::wstring(L".\\plugins\\") + std::wstring(fd.cFileName);
+        HINSTANCE temp = LoadLibraryW(path.c_str());
+
+        if(!temp) {
+            _logger.log(LL_WARN, "Failed to load plugin: ");
+            continue;
+        }
+
+        typedef std::unique_ptr<api::Plugin> (__cdecl *PProc)(void);
+        PProc getP = (PProc) GetProcAddress(temp, "get_plugin");
+
+        _plugins.push_back(std::move(getP()));
+        FreeLibrary(temp);
+    } while(FindNextFileW(fh, &fd));
+    FindClose(fh);
 }
 
 void Server::send_serv_idt( const sock::Client& client, bool op ) const {
@@ -201,11 +238,4 @@ void Server::echo_pckt( const std::vector<char>& data ) const {
     for(auto& p : _players) {
         p.socket().send_pckt(data);
     }
-}
-
-bool Server::player_id_exist( const int8_t id ) const {
-    for(auto& player : _players) {
-        if(player.id() == id) return true;
-    }
-    return false;
 }
